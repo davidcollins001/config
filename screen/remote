@@ -1,0 +1,19 @@
+sessionname remote
+chdir $HOME
+screen -t desktop1 1
+stuff "screen -x desktop1"
+chdir $HOME
+screen -t phd_writing 2
+stuff "screen -x phd_writing"
+chdir $HOME
+screen -t idl 3
+stuff "screen -x idl"
+chdir $HOME
+screen -t elinks 4
+stuff "screen -x elinks"
+chdir $HOME
+screen -t desktop5 5
+stuff "screen -x desktop5"
+chdir $HOME
+source .screenrc
+escape {{

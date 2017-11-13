@@ -1,0 +1,6 @@
+sessionname thesis
+chdir $HOME/Documents/phd_writing/thesis/thesis_root
+screen -t thesis 0
+chdir $HOME
+source .screenrc
+

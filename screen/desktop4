@@ -1,0 +1,16 @@
+sessionname elinks
+chdir $HOME
+screen -t elinks 0
+stuff "elinks"
+chdir $HOME
+screen -t email 1
+stuff "mailx -A smail"
+chdir $HOME
+screen -t backup 2
+stuff "cron_backup"
+chdir $HOME/Documents/papers
+screen -t papers 3
+chdir $HOME
+screen -t tcsh 1
+chdir $HOME
+source $HOME/.screenrc

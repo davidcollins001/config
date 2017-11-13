@@ -1,0 +1,13 @@
+sessionname phd_writing
+chdir $HOME/Documents/phd_writing/paper_1
+screen -t paper 0
+chdir $HOME/Documents/papers
+screen -t papers 1
+chdir /storage/astro2/phrfad/data/ss_cygnus/analysis/P10040_time_backerr_1
+screen -t data 2
+chdir $HOME/Documents/phd_writing/thesis/thesis_root
+screen -t thesis 3
+chdir /storage/astro2/phreai/monthesis_0208
+screen -t tcsh 5
+chdir $HOME
+source .screenrc

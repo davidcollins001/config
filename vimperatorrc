@@ -1,0 +1,25 @@
+"2.3.1 (created: 2010/04/07 18:25:13)
+
+map + k
+map <F4> :q<Return>
+map > gt
+map <lt> gT
+map C d
+map -- - j
+nmap + k
+nmap <F4> :q<Return>
+nmap > gt
+nmap <lt> gT
+nmap C d
+nmap -- - j
+set noincsearch
+set "runtimepath=C:\\unix\\home\\david.collins\\.vimperator"
+vmap + k
+vmap <F4> :q<Return>
+vmap > gt
+vmap <lt> gT
+vmap C d
+vmap -- - j
+source! "C:\\Users\\david.collins\\_vimperatorrc.local"
+
+" vim: set ft=vimperator:

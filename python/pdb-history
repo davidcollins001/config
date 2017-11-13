@@ -1,0 +1,200 @@
+dir(d)
+not 1 or 1<2
+not 1 or 2<1
+not None or 2<1
+from gmt.grid import api
+api.list_jobs('fodev')
+js = api.list_jobs('fodev')
+js[0]
+js[0].keys()
+js[0]['SubmittedBy']
+api.cancel
+dir(api)
+pp
+ppp
+ppp(dir(api))
+prinh api.cancel_job.__doc__
+print api.cancel_job.__doc__
+js[0]
+js[0].keys
+js[0].keys()
+import matplotlib.pyplot as p
+p
+p.plot(range(20), range(20))
+import matplotlib.pyplot as p
+matplotlib.get_backend()
+import matplotlib
+matplotlib.get_backend()
+matplotlib.switch_backend('template')
+matplotlib.use('template')
+import matplotlib
+matplotlib.use('template')
+import matplotlib.pyplot as p
+p.plot(range(20), range(20))
+p.show()
+matplotlib.get_backend()
+import pdb; pdb.set_trace()
+import os
+import gazprom.mt.pricing
+gazprom.mt.pricing
+quit()
+from gazprom.mt.pricing.grid import GridModel
+quit()
+from gazprom.mt.pricing.grid import GridModel
+model = GridModel.from_hpc_id(2528638)
+quit()
+import pdb; pdb.set_trace()
+wt 93.9
+c
+'snths')
+a
+a = {}
+print a.update.__doc__
+a = {}
+a.update(1=1)
+a.update('1'=1)
+a.update('1'='1')
+import os
+print os.remove.__doc__
+os.OSError
+OSError
+import conda_build
+import conda_build as c
+c.external
+from conda_build import external
+dir(external)
+find
+external.find_executable('git')
+from conda_build import external
+external.find_executable('git')
+from conda_build import external as ee
+ee.
+ee.find_executable('git')
+sys.platform
+l
+n
+config.build_prefix
+n
+l
+sys.platform
+l
+dir_paths
+n
+dir_paths
+l
+os.environ['PATH'].split
+n
+dir_paths
+from pprint import pprint as pp
+pp(dir_paths)
+os
+os.join(['a','b'])
+dir(os)
+os.path.join
+os.path.join(['a','b'])
+os.path.join('a','b')
+import gmt.util.quant as q
+q
+q.date.calendar.Calendar
+q.date
+dir(q)
+import gmt.util.quant.date as d
+d
+d.calendar.Calendar
+dir(d)
+not 1 or 1<2
+not 1 or 2<1
+not None or 2<1
+from gmt.grid import api
+api.list_jobs('fodev')
+js = api.list_jobs('fodev')
+js[0]
+js[0].keys()
+js[0]['SubmittedBy']
+api.cancel
+dir(api)
+pp
+ppp
+ppp(dir(api))
+prinh api.cancel_job.__doc__
+print api.cancel_job.__doc__
+js[0]
+js[0].keys
+js[0].keys()
+import matplotlib.pyplot as p
+p
+p.plot(range(20), range(20))
+import matplotlib.pyplot as p
+matplotlib.get_backend()
+import matplotlib
+matplotlib.get_backend()
+matplotlib.switch_backend('template')
+matplotlib.use('template')
+import matplotlib
+matplotlib.use('template')
+import matplotlib.pyplot as p
+p.plot(range(20), range(20))
+p.show()
+matplotlib.get_backend()
+import pdb; pdb.set_trace()
+import os
+import gazprom.mt.pricing
+gazprom.mt.pricing
+quit()
+from gazprom.mt.pricing.grid import GridModel
+quit()
+from gazprom.mt.pricing.grid import GridModel
+model = GridModel.from_hpc_id(2528638)
+quit()
+import pdb; pdb.set_trace()
+wt 93.9
+c
+l
+sel.floc
+self.locals
+self.locals.keys()
+name
+self.locals[name]
+pp self.labels
+pp self.locals
+pp self.locals.keys()
+name
+self.locals[name]
+pp self.locals.keys()
+self.locals[name]
+stmts
+c
+l
+c
+l
+c.get_dcq
+l
+c
+l
+c
+l
+c
+norm_state_space.qmin_real.value_counts()
+exp
+np.allclose(exp, norm_state_space.qmin_real.value_counts())
+n
+l
+n
+exp
+c
+n
+l
+c
+l
+nn
+t
+states
+c
+ll
+nn
+ss
+nn
+ss
+nn
+b 922
+c

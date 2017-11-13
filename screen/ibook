@@ -1,0 +1,21 @@
+sessionname ibook
+source .screenrc
+chdir $HOME
+screen -t rtorrent 0
+chdir $HOME
+screen -t mplayer 1
+chdir $HOME/src/programming/C
+screen -t C 2
+chdir $HOME/src/programming/C/nerdkits
+screen -t avr 3
+chdir $HOME
+screen -t mailx 4
+stuff 'mailx -A gmail'
+chdir $HOME
+screen -t elinks 5
+stuff 'elinks'
+chdir $HOME/src/programming/Cpp/shape/second
+screen -t shape 6
+chdir $HOME/src/programming/Cpp/ray_trace
+screen -t ray 7
+chdir $HOME

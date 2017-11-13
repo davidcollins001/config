@@ -1,0 +1,12 @@
+sessionname desktop1
+chdir $HOME/Documents/programming/kernel/cmu_kernel/410/p2/p2/user/lib/thread
+screen -t p2 0
+chdir $HOME/Documents/programming/kernel/cmu_kernel/410/p2/p2
+screen -t p2 1
+chdir $HOME/Documents/programming/kernel/cmu_kernel/410/
+screen -t p2 2
+stuff "elinks projects.html"
+chdir $HOME/src/programming/C
+screen -t C 3
+chdir $HOME
+source $HOME/.screenrc

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+## copy/link this script to .git/hooks/`hook` for ctags to be updated
+## good hooks are: post-checkout, post-commit, post-merge, post-rewrite
+
+~/.git/hooks/ctags >/dev/null 2>&1 &
+

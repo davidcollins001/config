@@ -1,0 +1,100 @@
+vol_series.to_csv('vol.csv')
+n
+vol_series.to_csv('vol2.csv')
+n
+ll
+n
+ll
+nn
+c
+disable
+c
+ll
+a
+!a
+np.isnan(a)
+a
+!a
+sl = [slice(1,3),slice(1,2)]]
+sl = [slice(1,3),slice(1,2)]
+!a.loc(sl)
+!a.loc(sl) = 111
+c
+!a
+np.isnan(a)
+c
+ll
+c
+s
+ll
+coeffs
+spread
+spread_params
+n
+ll
+n
+spread_params
+n
+markets
+ll
+spread_params[0].market
+arc_keys[spread_params[0].market][0]
+ll
+c
+coeff
+leg
+factor
+c
+w
+c
+cmd
+s
+ll
+n
+ll
+cmd
+n
+ll
+n
+ll
+n
+cmd
+n
+ll
+Popen(self.cmd, shell=shell, stdout=PIPE, stderr=PIPE, env=self.env, **kwargs).communicate()
+#Popen(self.cmd, shell=shell, stdout=PIPE, stderr=PIPE, env=self.env, **kwargs).communicate()
+self.cmd
+import os
+os.cwd()
+pp dir(os)
+os.getcwd()
+self.cmd
+Popen(self.cmd, shell=shell, stdout=PIPE, stderr=PIPE, env=self.env, **kwargs).communicate()
+p Popen(self.cmd, shell=shell, stdout=PIPE, stderr=PIPE, env=self.env, **kwargs).communicate()
+print Popen(self.cmd, shell=shell, stdout=PIPE, stderr=PIPE, env=self.env, **kwargs).communicate()
+w
+ll
+res= Popen(self.cmd, shell=shell, stdout=PIPE, stderr=PIPE, env=self.env, **kwargs).communicate()
+res
+len(res)
+type(res)
+p res[0]
+type(res[0])
+type(res[1])
+print res[1]
+print res[0]
+bt
+env
+env.keys()
+self.path
+r
+ll
+grid_args
+n
+ll
+n
+ll
+n
+ll
+n
+c

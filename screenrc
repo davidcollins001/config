@@ -1,0 +1,258 @@
+## to open multiple buffers:
+## place dir and name in file in format
+##       screen -t name
+##       chdir dir
+##       screen -t name2
+##       chdir dir2
+##       chdir
+##
+## call from in screen with
+## (current screen has high number)
+##      :source "file"
+## or source it in .screenrc file
+
+#source /tmp/screen_open
+
+
+#
+# Example of a user's .screenrc file
+#
+
+# set TERM to screen to get around the shell not
+# doing what I want it to!
+setenv TERM screen
+
+# This is how one can set a reattach password:
+# password ODSJQf.4IJN7E    # "1234"
+
+# no annoying audible bell, please
+vbell off
+
+# start in $HOME directory
+#chdir ${HOME}
+
+# set file to copy paste buffer to
+bufferfile /tmp/buf
+
+# set activity alert
+activity 'Activity in window %n'
+
+# detach on hangup
+autodetach on
+
+# don't display the copyright page
+startup_message off
+
+# emulate .logout message
+pow_detach_msg "Screen session of \$LOGNAME \$:cr:\$:nl:ended."
+
+# advertise hardstatus support to $TERMCAP
+# termcapinfo  * '' 'hs:ts=\E_:fs=\E\\:ds=\E_\E\\'
+
+# make the shell in every window a login shell
+#shell -$SHELL
+
+# autoaka testing
+# shellaka '> |tcsh'
+# shellaka '$ |sh'
+
+# set every new windows hardstatus line to somenthing descriptive
+# defhstatus "screen: ^En (^Et)"
+
+defscrollback 1000
+
+# don't kill window after the process died
+# zombie "^["
+
+# enable support for the "alternate screen" capability in all windows
+# altscreen on
+
+################
+#
+# xterm tweaks
+#
+#
+# #xterm understands both im/ic and doesn't have a status line.
+# #Note: Do not specify im and ic in the real termcap/info file as
+# #some programs (e.g. vi) will not work anymore.
+# termcap  xterm hs@:cs=\E[%i%d;%dr:im=\E[4h:ei=\E[4l
+# terminfo xterm hs@:cs=\E[%i%p1%d;%p2%dr:im=\E[4h:ei=\E[4l
+#
+# #80/132 column switching must be enabled for ^AW to work
+# #change init sequence to not switch width
+# termcapinfo  xterm Z0=\E[?3h:Z1=\E[?3l:is=\E[r\E[m\E[2J\E[H\E[?7h\E[?1;4;6l
+#
+# # Make the output buffer large for (fast) xterms.
+# #termcapinfo xterm* OL=10000
+# termcapinfo xterm* OL=100
+#
+# # tell screen that xterm can switch to dark background and has function
+# # keys.
+# termcapinfo xterm 'VR=\E[?5h:VN=\E[?5l'
+# termcapinfo xterm 'k1=\E[11~:k2=\E[12~:k3=\E[13~:k4=\E[14~'
+# termcapinfo xterm 'kh=\EOH:kI=\E[2~:kD=\E[3~:kH=\EOF:kP=\E[5~:kN=\E[6~'
+#
+# # special xterm hardstatus: use the window title.
+# termcapinfo xterm 'hs:ts=\E]2;:fs=\007:ds=\E]2;screen\007'
+#
+# #terminfo xterm 'vb=\E[?5h$<200/>\E[?5l'
+# termcapinfo xterm 'vi=\E[?25l:ve=\E[34h\E[?25h:vs=\E[34l'
+#
+# # emulate part of the 'K' charset
+# termcapinfo   xterm 'XC=K%,%\E(B,[\304,\\\\\326,]\334,{\344,|\366,}\374,~\337'
+#
+# # xterm-52 tweaks:
+# # - uses background color for delete operations
+# termcapinfo xterm* be
+
+
+# terminfo and termcap for nice 256 color terminal
+# allow bold colors - necessary for some reason
+attrcolor b ".I"
+# tell screen how to set colors. AB = background, AF=foreground
+termcapinfo xterm 'Co#256:AB=\E8;5;%dm:AF=\E8;5;%dm'
+# erase background with current bg color
+defbce "on"
+
+deflogin "off"
+
+# ################
+# #
+# # wyse terminals
+# #
+#
+# #wyse-75-42 must have flow control (xo = "terminal uses xon/xoff")
+# #essential to have it here, as this is a slow terminal.
+# termcapinfo wy75-42 xo:hs@
+#
+# # New termcap sequences for cursor application mode.
+# termcapinfo wy* CS=\E[?1h:CE=\E[?1l:vi=\E[?25l:ve=\E[?25h:VR=\E[?5h:VN=\E[?5l:cb=\E[1K:CD=\E[1J
+#
+# ################
+# #
+# # other terminals
+# #
+#
+# # make hp700 termcap/info better
+# termcapinfo  hp700 'Z0=\E[?3h:Z1=\E[?3l:hs:ts=\E[62"p\E[0$~\E[2$~\E[1$}:fs=\E[0}\E[61"p:ds=\E[62"p\E[1$~\E[61"p:ic@'
+#
+# # Extend the vt100 desciption by some sequences.
+# termcap  vt100* ms:AL=\E[%dL:DL=\E[%dM:UP=\E[%dA:DO=\E[%dB:LE=\E[%dD:RI=\E[%dC
+# terminfo vt100* ms:AL=\E[%p1%dL:DL=\E[%p1%dM:UP=\E[%p1%dA:DO=\E[%p1%dB:LE=\E[%p1%dD:RI=\E[%p1%dC
+# termcapinfo linux C8
+# # old rxvt versions also need this
+# # termcapinfo rxvt C8
+#
+#
+################
+#
+# keybindings
+#
+
+# remap C-a  to t
+#escape ^Zz
+escape [[	# try this !?! - press open bracket then cmd
+		# nice if it stops me using pinky so much
+
+# remove some stupid / dangerous key bindings
+bind k
+bind ^k
+bind .
+bind ^\
+bind \\
+bind ^h
+bind h
+bind ^g
+bind S
+bind Q
+bind X
+bind A
+bind ^g
+bind r
+bind ^r
+bind x
+bind ^x
+
+# make them better
+bind 'K' kill
+bind 'I' login on
+bind 'O' login off
+bind '}' history
+bind ^a  title
+bind 'a' title
+#bind 's' split
+## split window and focus last window in bottom frame
+bind 's' eval split focus other focus
+bind 'q' only
+bind 'x' remove
+bind 'R' wrap
+bind 'o' focus
+bind 'l' other
+
+# bind keys '[ - [0-9]' to screens 10-19
+bind - command -c select10
+bind -c select10 0 select 10
+bind -c select10 1 select 11
+bind -c select10 2 select 12
+bind -c select10 3 select 13
+bind -c select10 4 select 14
+bind -c select10 5 select 15
+bind -c select10 6 select 16
+bind -c select10 7 select 17
+bind -c select10 8 select 18
+bind -c select10 9 select 19
+
+
+## split window and focus last window in bottom frame
+#bindkey -k k; eval split focus other focus   # F10
+bindkey -k F2 detach # detach on F12
+
+bindkey -k k5 escape ^Aa # change escape on F1
+bindkey -k k6 escape [[ # change escape on F2
+
+# copy mode more like less
+#markkeys "^e=j:^y=k"
+#markkeys "^u=b:^d=f"
+#markkeys "^d=f"
+#markkeys "$=^e"
+
+# Yet another hack:
+# Prepend/append register [/] to the paste if ^a^] is pressed.
+# This lets me have autoindent mode in vi.
+register [ "\033:se noai\015a"
+register ] "\033:se ai\015a"
+bind ^] paste [.]
+
+################
+#
+# default windows
+#
+
+# screen -t local 0
+# screen -t mail 1 mutt
+# screen -t 40 2 rlogin server
+
+
+# place shell title at bottom of screen
+# caption always "%-Lw%{= BW}%50>%n%f* %t%{-}%+Lw%<"
+
+# bind = resize =
+# bind + resize +1
+# bind - resize -1
+# bind _ resize max
+#
+# defnonblock 1
+# blankerprg rain -d 100
+# idle 30 blanker
+
+
+hardstatus on
+hardstatus alwayslastline
+hardstatus string "%{.bw}%-w%{.rW}%n %t%{-}%+w %=%{..G} %H %{..Y}%d/%m/%y %c%a "
+
+# This adds a statusbar:
+# - windows and their flags before the active one are listed in white and truncated with ...
+# - the active window and it's flags are in bold cyan and aligned slightly to the left
+# - the rest of the windows are printed and truncated so that
+# - a string describing the current machine, load, and date/time are right aligned
+#caption always "%{= .w}%-Lw%20L>%{=b .c}%n%f %t%{-}%+Lw %-048= @%H - %l - %D %d %M - %c"

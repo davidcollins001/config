@@ -1,0 +1,19 @@
+sessionname desktop8
+chdir /storage/astro2/phrfad/data/ss_cygnus/analysis/P10040_time_backerr_1
+screen -t tcsh 0
+chdir /storage/astro2/phrfad/data/ss_cygnus/analysis/P20033
+screen -t P20033 1
+chdir /storage/astro2/phrfad/data/ss_cygnus/analysis/P40012
+screen -t P40012 2
+chdir /storage/astro2/phrfad/data/ss_cygnus/analysis/P50011
+screen -t P50011 3
+chdir /storage/astro2/phrfad/data/ss_cygnus/analysis/P50012
+screen -t P50012 4
+chdir /storage/astro2/phrfad/data/ss_cygnus/analysis/P90007
+screen -t P90007 5
+chdir /storage/astro2/phrfad/data/ugem/analysis/P20035
+screen -t P20035 6
+chdir /storage/astro2/phrfad/data/ugem/analysis/P80011
+screen -t P80011 7
+chdir $HOME
+source .screenrc

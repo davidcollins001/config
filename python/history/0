@@ -1,0 +1,84 @@
+      print a, b, (a and not b) or (not a and b), bool(a) ^ bool(b), a!=b, not(a and b)
+for a in [True, False]:
+  for c in [True, False]:
+    for b in [True, False]:
+      print a, b, (a and not b) or (not a and b), bool(a) ^ bool(b), a!=b !=c, not(a and b)
+a = {1,2}
+len(a)
+{}.iteritems()
+list ({}.iteritems())
+slice
+a = range(10)
+a[slice(1,2)]
+a[slice(1,3)]
+slice(1,2)
+slice(1,2,4)
+a[slice(1,3,3)]
+a = [range(4), range(4)]
+a
+a[[slice(1:2),slice(2,3)]]
+a[[slice(1,2),slice(2,3)]]
+a[slice(1,2),slice(2,3)]
+a[1,2]
+a[1][2]
+from collections import namedtuple
+namedtuple('a','b')
+a=namedtuple('a','b')
+a['a'] = 1
+a.a=1
+a
+a.b=2
+a
+import pandas as pd
+import numpy as np
+pd.DataFrame(np.arange(25).reshape(5,5))
+df=pd.DataFrame(np.arange(25).reshape(5,5))
+df.columns = [0,
+df=pd.DataFrame(np.arange(49).reshape(7,7))
+df
+df.columns = [0,1,4,5,6,7,8]
+df
+np.triu_indices(len(df))
+df[np.triu_indices(len(df))]
+df[np.triu_indices(len(df))] = False
+mask = np.ones(df.shape,dtype='bool')
+mask
+mask[np.triu_indices(len(df))] = False
+mask
+np.indices(5)
+np.indices((5,5))
+np.indices((3,5))
+df
+df.columns
+df.columns*len(df.index)
+(df.columns,)*len(df.index)
+(df.columns,)*len(df.index) == (df.index,)*len(df.columns)
+df.columns
+int(df.columns)
+[a for a in df.columns]
+dfc = [a for a in df.columns]
+[dfc]*4
+np.array([dfc]*4)
+dfc=np.array([dfc]*4)
+dfi=np.array([df.index]*len(df.columns))
+dfi
+dfc=np.array([df.columns]*len(df.index)
+)
+dfc=np.array([df.columns]*len(df.index))
+dfc
+dfi
+dfi == dfc
+dfc=np.array([df.columns]*len(df.index))
+np.hstack([df.columns]*4)
+np.array(np.hstack([df.columns]*4))
+dfi.T
+dfc
+dfi = dfi.T
+dfi == dfc
+dfi > dfc
+o
+[df.columns]*4
+df
+df.columns
+bool([None])
+()

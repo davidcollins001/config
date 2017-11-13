@@ -1,0 +1,10 @@
+sessionname desktop6
+chdir /storage/astro2/phrfad/data/ss_cygnus/analysis/P10040_time/1996-10-09T16:47:28
+screen -t tcsh 0
+stuff "xspec"
+chdir $HOME
+chdir /storage/astro2/phrfad/data/ss_cygnus/analysis/P10040_time/1996-10-10T18:30:24
+screen -t tcsh 1
+stuff "xspec"
+chdir $HOME
+source $HOME/.screenrc

@@ -1,0 +1,15 @@
+sessionname idl
+chdir $HOME/src/software/idl
+screen -t idl 0
+logfile $HOME/src/software/idl/idl_screen.log
+logfile flush 1
+log on
+stuff "idl"
+chdir $HOME/src/software/idl/fits2ps
+screen -t lib 1
+chdir /storage/astro2/phrfad/data/ss_cygnus/analysis/P10040_time_backerr_1
+screen -t data 2
+chdir /storage/astro2/phrfad/data/startups
+screen -t models 3
+chdir $HOME
+source .screenrc

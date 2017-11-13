@@ -1,0 +1,13 @@
+sessionname desktop5
+chdir $HOME
+screen -t cow 0
+#stuff "watch_cow"
+chdir $HOME
+chdir /storage/astro2/phrfad/data/startups
+screen -t tcsh 1
+chdir /storage/astro2/phrfad/data/ss_cygnus/analysis/P10040_time_backerr_1
+screen -t tcsh 4
+chdir /storage/astro2/phrfad/data/ss_cygnus/analysis/P10040_time_backerr_1
+screen -t tcsh 4
+chdir $HOME
+source .screenrc

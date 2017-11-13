@@ -1,0 +1,5 @@
+setenv SSH_CLIENT '90.194.32.72 51083 22'
+setenv SSH_TTY '/dev/pts/25'
+setenv SSH_AUTH_SOCK ''
+setenv SSH_CONNECTION '90.194.32.72 51083 137.205.63.19 22'
+setenv DISPLAY 'localhost:11.0'
