@@ -43,7 +43,8 @@ set whichwrap=<,>,[,]   " Left/right arrow keys wrap
 set nowrap
 set winheight=4         " At least 4 lines for current window
 set cinoptions=:0,p0,t0,(1s           " C language indent options
-set tags=./tags,tags,../tags          " Tags file search path
+"set tags=.git/tags; "./tags,.git/tags,tags,../tags " Tags file search path
+set tags=.git/tags;     " Tags file search path
 set dictionary=/usr/dict/words        " Dictionary file path
 set path=.,include,../include,../../include,/usr/local/include/g++,/usr/local/lib/g++-include,/usr/include,, " Include file path
 set wildmode=longest,list	" Command line completion matches longest common
@@ -68,6 +69,12 @@ set mouse=a             " Enable mouse to place cursor
 "set guicursor+=i:iCursor
 "set cursorline
 
+" tell vim where to find tag file
+" set tags=./.git/tags;,.git/tags;
+map <leader>t :tn<cr>
+map <leader>st :stn<cr>
+" ctags optimization
+set autochdir
 
 """""
 """"" EDITING MODES
@@ -214,6 +221,13 @@ autocmd FileType python setlocal foldignore=
 " add breakpoint using \(b|B)
 autocmd FileType python noremap <silent> <leader>b oimport pdb; pdb.set_trace()<esc>
 autocmd FileType python noremap <silent> <leader>B Oimport pdb; pdb.set_trace()<esc>
+let g:flake8_show_in_gutter=1
+autocmd BufWritePost *.py call Flake8()
+autocmd BufWritePost *.pxy call Flake8()
+
+" set cython filetypes as python
+autocmd BufNewFile,BufRead *.pyx  setlocal filetype=python
+autocmd BufNewFile,BufRead *.pxd setlocal filetype=python
 
 " xml specific
 "au FileType xml exe ":silent 1,$!xmllint --format --recover - 2>/dev/null"
@@ -370,4 +384,29 @@ vnoremap <silent> # :<C-U>
 noremap <silent> ,/ :nohlsearch<CR>
 "" toggle paste mode
 noremap <silent> ,p :set pastetoggle<CR>
+
+
+
+filetype off                  " required
+
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('~/some/path/here')
+
+" let Vundle manage Vundle, required
+Plugin 'gmarik/Vundle.vim'
+Plugin 'nvie/vim-flake8'
+Plugin 'vim-scripts/indentpython.vim'
+" Plugin 'scrooloose/syntastic'
+
+" Add all your plugins here (note older versions of Vundle used Bundle instead of Plugin)
+
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+
 
