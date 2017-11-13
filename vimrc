@@ -221,9 +221,6 @@ autocmd FileType python setlocal foldignore=
 " add breakpoint using \(b|B)
 autocmd FileType python noremap <silent> <leader>b oimport pdb; pdb.set_trace()<esc>
 autocmd FileType python noremap <silent> <leader>B Oimport pdb; pdb.set_trace()<esc>
-let g:flake8_show_in_gutter=1
-autocmd BufWritePost *.py call Flake8()
-autocmd BufWritePost *.pxy call Flake8()
 
 " set cython filetypes as python
 autocmd BufNewFile,BufRead *.pyx  setlocal filetype=python
@@ -386,21 +383,28 @@ noremap <silent> ,/ :nohlsearch<CR>
 noremap <silent> ,p :set pastetoggle<CR>
 
 
+"" syntastic checker
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
 
-filetype off                  " required
+let g:syntastic_python_checkers = ['flake8']
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
 
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
+filetype off                  " required
 call vundle#begin()
-
-" alternatively, pass a path where Vundle should install plugins
-"call vundle#begin('~/some/path/here')
 
 " let Vundle manage Vundle, required
 Plugin 'gmarik/Vundle.vim'
-Plugin 'nvie/vim-flake8'
 Plugin 'vim-scripts/indentpython.vim'
-" Plugin 'scrooloose/syntastic'
+Plugin 'scrooloose/syntastic'
+" Plugin 'Align.vim'
 
 " Add all your plugins here (note older versions of Vundle used Bundle instead of Plugin)
 
