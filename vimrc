@@ -383,18 +383,18 @@ noremap <silent> ,/ :nohlsearch<CR>
 noremap <silent> ,p :set pastetoggle<CR>
 
 
-"" syntastic checker
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
+"" syntastic checker, use :Errors and :lclose to show and close errors
 let g:syntastic_python_checkers = ['flake8']
 let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
+let g:syntastic_loc_list_height = 5
+let g:syntastic_auto_loc_list = 2
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
 
 
+"" to install vundle
+"" move .vim out the way and run
+"" git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 " set the runtime path to include Vundle and initialize
 set rtp+=~/.vim/bundle/Vundle.vim
 filetype off                  " required
@@ -404,10 +404,8 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 Plugin 'vim-scripts/indentpython.vim'
 Plugin 'scrooloose/syntastic'
-" Plugin 'Align.vim'
-
-" Add all your plugins here (note older versions of Vundle used Bundle instead of Plugin)
-
+Plugin 'Align'
+" Plugin 'Solarized'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
