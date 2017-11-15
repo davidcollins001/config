@@ -17,9 +17,9 @@
 	autocrlf = input
 
 [remote "upstream"]
-                url = http://github01pr/TradingAnalytics/pricing
-                fetch = +refs/heads/*:refs/remotes/upstream/*
-                fetch = +refs/heads/*:refs/remotes/origin/*
-                fetch = +refs/pull/*/head:refs/remotes/upstream/pr/*
+    fetch = +refs/heads/*:refs/remotes/upstream/*
+    fetch = +refs/heads/*:refs/remotes/origin/*
+    fetch = +refs/pull/*/head:refs/remotes/upstream/pr/*
+
 [init]
 	templatedir = ~/.git/template

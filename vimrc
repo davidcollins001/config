@@ -43,8 +43,7 @@ set whichwrap=<,>,[,]   " Left/right arrow keys wrap
 set nowrap
 set winheight=4         " At least 4 lines for current window
 set cinoptions=:0,p0,t0,(1s           " C language indent options
-"set tags=.git/tags; "./tags,.git/tags,tags,../tags " Tags file search path
-set tags=.git/tags;     " Tags file search path
+set tags=.git/tags;$HOME" Tags file search path
 set dictionary=/usr/dict/words        " Dictionary file path
 set path=.,include,../include,../../include,/usr/local/include/g++,/usr/local/lib/g++-include,/usr/include,, " Include file path
 set wildmode=longest,list	" Command line completion matches longest common
@@ -57,6 +56,12 @@ set nowarn
 set hidden              " Allow edited files to be hidden
 set hlsearch
 set mouse=a             " Enable mouse to place cursor
+
+"" set directory for backup files
+" if !isdirectory("~/tmp/vim_backup")
+    " silent! execute "!mkdir ~/tmp/vim_backup"
+" endif
+" set backupdir="."
 
 "highlight! Cursor gui=NONE guifg=black guibg=cyan
 "highlight! VisualCursor gui=NONE guifg=darkblue guibg=black
@@ -405,6 +410,7 @@ Plugin 'gmarik/Vundle.vim'
 Plugin 'vim-scripts/indentpython.vim'
 Plugin 'scrooloose/syntastic'
 Plugin 'Align'
+Plugin 'highlight.vim'
 " Plugin 'Solarized'
 
 " All of your Plugins must be added before the following line
