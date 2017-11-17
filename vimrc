@@ -113,6 +113,7 @@ nmap <silent> <Leader>ef :vsplit<bar>wincmd l<bar>exe "norm!  Ljz<c-v><cr>"<cr>:
 map ( :cp<CR>0
 map ) :cn<CR>0
 
+"" insert date
 nmap _D md:r !date '+\\%Y-\\%m-\\%d \\%H:\\%M:\\%S'<CR>`d
 if version >= 500
   nmap _D mdo<C-R>=strftime("%Y-%m-%d %H:%M:%S")<CR><Esc>`d
@@ -123,10 +124,10 @@ endif
 """"" FUNCTION KEYS
 """""
 
-"   F1: Help  F5: Center line  F9: Reformat paragraph
-"   F2: Save  F6: Next window  F10: Zoom window
-"   F3: Edit  F7: Prev buffer  F11/S-F3: Split window
-"   F4: Quit  F8: Next buffer  F12/S-F4: Save & quit all
+"   F1: Help
+"   F2: Save
+"   F3: Edit
+"   F4: Quit
 
 nmap <F1> :ls<CR>:b<Space>
 imap <F1> <C-O>:ls<CR>:b<Space>
@@ -143,72 +144,12 @@ cmap <F4> <C-U>bwipeout<CR>
 " nmap <F4> :call CloseOrQuit()<CR>
 " imap <F4> <C-O>:call CloseOrQuit()<CR>
 " cmap <F4> <C-U>call CloseOrQuit()<CR>
-nmap <F5> zz
-vmap <F5> zz
-imap <F5> <C-O>zz
-nmap <F6> <C-W><C-W>
-imap <F6> <C-O><C-W><C-W>
-nmap <S-F6> <C-W>W
-imap <S-F6> <C-O><C-W>W
-nmap <F7> :bprevious<CR>
-imap <F7> <C-O>:bprevious<CR>
-nmap <F8> :bnext<CR>
-imap <F8> <C-O>:bnext<CR>
 nmap < :bprevious<CR>
 nmap > :bnext<CR>
-nmap <S-F10> <C-W>_
-imap <S-F10> <C-O><C-W>_
-nmap <F11> :new<Space>
-imap <F11> <C-O>:new<Space>
-cmap <F11> <C-U>new<Space>
-nmap <F12> :xa<CR>
-imap <F12> <C-O>:xa<CR>
-cmap <F12> <C-U>xa
-
-nmap <C-X> :w<CR>
-
-map  <S-F3> <F11>
-map! <S-F3> <F11>
-map  <S-F4> <F12>
-map! <S-F4> <F12>
-
-map  <Esc>OT <F5>
-map! <Esc>OT <F5>
-map  <Esc>OU <F6>
-map! <Esc>OU <F6>
-map  <Esc>OV <F7>
-map! <Esc>OV <F7>
-map  <Esc>OW <F8>
-map! <Esc>OW <F8>
-map  <Esc>OX <F9>
-map! <Esc>OX <F9>
-map  <Esc>OY <F10>
-map! <Esc>OY <F10>
-map  <Esc>OZ <F11>
-map! <Esc>OZ <F11>
-map  <Esc>O[ <F12>
-map! <Esc>O[ <F12>
-map  <Esc>[5~ <PageUp>
-map! <Esc>[5~ <PageUp>
-map  <Esc>[6~ <PageDown>
-map! <Esc>[6~ <PageDown>
-map  <Esc>[1~ <Home>
-map! <Esc>[1~ <Home>
-map  <Esc>[4~ <End>
-map! <Esc>[4~ <End>
-map  <Esc>[2~ <Insert>
-map! <Esc>[2~ <Insert>
-
-map [t :tlast<cr>
-map ]t :tnext<cr>
-map =t :tselect<cr>
 
 " -/+ scroll like ^e/^y
 map - 
 map + 
-map  zz
-map dl 0D
-map <C-x><C-s> <Esc>:w<CR>
 
 " buffer mappings
 map :bd<CR> :b#<CR>:bd#<CR>
@@ -228,11 +169,11 @@ autocmd FileType python noremap <silent> <leader>b oimport pdb; pdb.set_trace()<
 autocmd FileType python noremap <silent> <leader>B Oimport pdb; pdb.set_trace()<esc>
 
 " set cython filetypes as python
-autocmd BufNewFile,BufRead *.pyx  setlocal filetype=python
+autocmd BufNewFile,BufRead *.pyx setlocal filetype=python
 autocmd BufNewFile,BufRead *.pxd setlocal filetype=python
 
 " xml specific
-"au FileType xml exe ":silent 1,$!xmllint --format --recover - 2>/dev/null"
+"autocmd FileType xml exe ":silent 1,$!xmllint --format --recover - 2>/dev/null"
 autocmd FileType xml setlocal foldmethod=indent
 autocmd FileType xml setlocal shiftwidth=2
 
@@ -247,7 +188,7 @@ autocmd FileType java setlocal noexpandtab
 autocmd FileType vim setlocal foldmethod=indent
 
 augroup vimrcEx
-  au!
+  autocmd!
     " When editing a file, always jump to the last known cursor position.
     " Don't do it when the position is invalid or when inside an event handler
     " (happens when dropping a file on gvim).
@@ -259,7 +200,7 @@ augroup END
 
 " Run gvim maximized
 if has("gui_running")
-    au GUIEnter * simalt ~x
+    autocmd GUIEnter * simalt ~x
 
     set guioptions=ac
     set guioptions-=mrlb
@@ -274,8 +215,6 @@ let @s='0i"A",'
 "" make paragraph jump skip folds and not whitespace lines
 let g:ip_skipfold=1
 let g:ip_boundary='"\?\s*$'
-
-let $TMP="C:\\tmp"
 
 function MyDiff()
    let opt = '-a --binary '
@@ -308,35 +247,18 @@ function MyDiff()
 
 set diffexpr=MyDiff()
 
-"" pymode settings
-let g:pymode_rope = 0
-let g:pymode_lint_checkers = []
-
 
 "Change read/only files to read/write when they are edited
-au FileChangedRO * !start attrib -r %
-au FileChangedRO * :let s:changedRO = 1
-au FileChangedRO * :set noro
-
-"Don't ask about the modified read-only file
-au FileChangedShell * call s:HandleChangedROFile()
-
-function s:HandleChangedROFile()
-   if exists('s:changedRO') && s:changedRO == 1
-      let s:changedRO = 0
-      let v:fcs_choice='reload'
-   else
-      v:fcs_choice='ask'
-   endif
-endfunction
-
-let g:scratch_height = 1.0
+autocmd FileChangedRO * !start attrib -r %
+autocmd FileChangedRO * :let s:changedRO = 1
+autocmd FileChangedRO * :set noro
 
 
 " Commenting blocks of code.
 autocmd FileType c,cpp,java,scala let b:comment_leader = '// '
 autocmd FileType sh,ruby,python   let b:comment_leader = '# '
 autocmd FileType conf,fstab       let b:comment_leader = '# '
+autocmd FileType make             let b:comment_leader = '# '
 autocmd FileType tex              let b:comment_leader = '% '
 autocmd FileType mail             let b:comment_leader = '> '
 autocmd FileType vim              let b:comment_leader = '" '
@@ -370,17 +292,6 @@ endfunc
 
 nmap :fx :call FormatXML()<CR>
 
-" Search for selected text, forwards or backwards.
-vnoremap <silent> * :<C-U>
-  \let old_reg=getreg('"')<Bar>let old_regtype=getregtype('"')<CR>
-  \gvy/<C-R><C-R>=substitute(
-  \escape(@", '/\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
-  \gV:call setreg('"', old_reg, old_regtype)<CR>
-vnoremap <silent> # :<C-U>
-  \let old_reg=getreg('"')<Bar>let old_regtype=getregtype('"')<CR>
-  \gvy?<C-R><C-R>=substitute(
-  \escape(@", '?\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
-  \gV:call setreg('"', old_reg, old_regtype)<CR>
 
 "" remove search highlight after search with ,/
 noremap <silent> ,/ :nohlsearch<CR>
@@ -416,5 +327,4 @@ Plugin 'highlight.vim'
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
 filetype plugin indent on    " required
-
 
