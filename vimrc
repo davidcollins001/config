@@ -81,6 +81,9 @@ map <leader>st :stn<cr>
 " ctags optimization
 set autochdir
 
+"" switch to/from relativenumber
+map <leader>rn :set relativenumber!<cr>
+
 """""
 """"" EDITING MODES
 """""
@@ -336,6 +339,7 @@ Plugin 'scrooloose/syntastic'
 Plugin 'Align'
 Plugin 'highlight.vim'
 " Plugin 'Solarized'
+Plugin 'TagBar'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
