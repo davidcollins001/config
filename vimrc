@@ -266,6 +266,19 @@ autocmd FileType vim              let b:comment_leader = '" '
 noremap <silent> ,cc :<C-B>silent <C-E>s/\(\S\)/<C-R>=escape(b:comment_leader,'\/')<CR>\1/<CR> :nohlsearch<CR> :call histdel("search", -1)<CR>
 noremap <silent> ,cu :<C-B>silent <C-E>s/\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR> :nohlsearch<CR> :call histdel("search", -1)<CR>
 
+" Search for highlightd text, possibly over multiple lines
+vnoremap <silent> * :<C-U>
+  \let old_reg=getreg('"')<Bar>let old_regtype=getregtype('"')<CR>
+  \gvy/<C-R><C-R>=substitute(
+  \escape(@", '/\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
+  \gV:call setreg('"', old_reg, old_regtype)<CR>
+vnoremap <silent> # :<C-U>
+  \let old_reg=getreg('"')<Bar>let old_regtype=getregtype('"')<CR>
+  \gvy?<C-R><C-R>=substitute(
+  \escape(@", '?\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
+  \gV:call setreg('"', old_reg, old_regtype)<CR>
+
+
 " " for command mode
 " nnoremap <S-Tab> <<
 " " for insert mode
@@ -296,7 +309,7 @@ nmap :fx :call FormatXML()<CR>
 "" remove search highlight after search with ,/
 noremap <silent> ,/ :nohlsearch<CR>
 "" toggle paste mode
-noremap <silent> ,p :set pastetoggle<CR>
+noremap <silent> ,p :set paste!<CR>
 
 
 "" syntastic checker, use :Errors and :lclose to show and close errors
