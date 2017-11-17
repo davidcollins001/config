@@ -76,7 +76,8 @@ set mouse=a             " Enable mouse to place cursor
 
 " tell vim where to find tag file
 " set tags=./.git/tags;,.git/tags;
-map <leader>t :tn<cr>
+map <leader>tn :tn<cr>
+map <leader>tp :tN<cr>
 map <leader>st :stn<cr>
 " ctags optimization
 set autochdir
@@ -322,6 +323,12 @@ let g:syntastic_loc_list_height = 5
 let g:syntastic_auto_loc_list = 2
 let g:syntastic_check_on_open = 1
 let g:syntastic_check_on_wq = 0
+
+
+"" tagbar config
+let g:tagbar_autoclose = 1
+let g:tagbar_autofocus = 1
+map <leader>tb :TagbarOpenAutoClose<cr>
 
 
 "" to install vundle
