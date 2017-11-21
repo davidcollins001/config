@@ -157,6 +157,8 @@ map + 
 
 " buffer mappings
 map :bd<CR> :b#<CR>:bd#<CR>
+" map <C-B> <C-^>
+map <C-B> :e#<cr>
 
 " folding
 set foldmethod=indent   " fold based on syntax
@@ -345,8 +347,8 @@ Plugin 'vim-scripts/indentpython.vim'
 Plugin 'scrooloose/syntastic'
 Plugin 'Align'
 Plugin 'highlight.vim'
-" Plugin 'Solarized'
 Plugin 'TagBar'
+" Plugin 'Solarized'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
