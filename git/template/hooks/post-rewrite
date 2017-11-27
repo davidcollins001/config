@@ -1,4 +1,5 @@
 #!/bin/sh
+dot_git=`git rev-parse --show-toplevel`/.git
 case "$1" in
-  rebase) exec post-merge ;;
+  rebase) exec $dot_git/hooks/post-merge ;;
 esac
