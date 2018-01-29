@@ -1,10 +1,10 @@
 
 [flake8]
 max-line-length = 120
-# E116: indented comments
+# E114: indented comments
+# E116: unexpected indentation
 # E265: The one about comments starting '# '
 # E266: Too many leading comments '# '
 # E127,E128: Errors about inline alignment
 # W391: blank line at EOF. Of course you want a blank line there.
-ignore = E116,E265,E266,E127,E128,W391
-
+ignore = E116,E266,503

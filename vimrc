@@ -57,11 +57,15 @@ set hidden              " Allow edited files to be hidden
 set hlsearch
 set mouse=a             " Enable mouse to place cursor
 
-"" set directory for backup files
-" if !isdirectory("~/tmp/vim_backup")
-    " silent! execute "!mkdir ~/tmp/vim_backup"
+"" if wrapping is switched on indent the wrapped line
+set breakindent
+let &showbreak=' '
+
+" "set directory for backup files
+" if !isdirectory("./.vim_backup")
+    " silent! execute "!mkdir ./.vim_backup"
 " endif
-" set backupdir="."
+" set backupdir="./.vim_backup"
 
 "highlight! Cursor gui=NONE guifg=black guibg=cyan
 "highlight! VisualCursor gui=NONE guifg=darkblue guibg=black
@@ -151,14 +155,15 @@ cmap <F4> <C-U>bwipeout<CR>
 nmap < :bprevious<CR>
 nmap > :bnext<CR>
 
+" Unfuck my screen
+nnoremap U :syntax sync fromstart<cr>:redraw!<cr>
+
 " -/+ scroll like ^e/^y
 map - 
 map + 
 
 " buffer mappings
 map :bd<CR> :b#<CR>:bd#<CR>
-" map <C-B> <C-^>
-map <C-B> :e#<cr>
 
 " folding
 set foldmethod=indent   " fold based on syntax
@@ -166,32 +171,33 @@ set foldminlines=0      " fold a single line
 "set foldlevelstart=1    " start with all folds closed
 
 " python specific
-autocmd FileType python setlocal foldmethod=indent
-autocmd FileType python setlocal foldignore=
-"autocmd FileType python setlocal nosmartindent autoindent
-"autocmd FileType python setlocal nosmartindent
-" add breakpoint using \(b|B)
-autocmd FileType python noremap <silent> <leader>b oimport pdb; pdb.set_trace()<esc>
-autocmd FileType python noremap <silent> <leader>B Oimport pdb; pdb.set_trace()<esc>
+augroup python
+    autocmd FileType python setlocal foldmethod=indent
+    autocmd FileType python setlocal foldignore=
+    "autocmd FileType python setlocal nosmartindent autoindent
+    "autocmd FileType python setlocal nosmartindent
+    " add breakpoint using \(b|B)
+    autocmd FileType python noremap <silent> <leader>b oimport pdb; pdb.set_trace()  # noqa: E702<esc>
+    autocmd FileType python noremap <silent> <leader>B Oimport pdb; pdb.set_trace()  # noqa: E702<esc>
 
-" set cython filetypes as python
-autocmd BufNewFile,BufRead *.pyx setlocal filetype=python
-autocmd BufNewFile,BufRead *.pxd setlocal filetype=python
+    " set cython filetypes as python
+    autocmd BufNewFile,BufRead *.pyx setlocal filetype=python
+    autocmd BufNewFile,BufRead *.pxd setlocal filetype=python
+augroup END
 
 " xml specific
-"autocmd FileType xml exe ":silent 1,$!xmllint --format --recover - 2>/dev/null"
-autocmd FileType xml setlocal foldmethod=indent
-autocmd FileType xml setlocal shiftwidth=2
-
-" slang specific
-autocmd BufRead,BufNewFile *.s setlocal filetype=slang
-autocmd FileType slang setlocal syntax=CPP
-autocmd FileType slang setlocal foldmethod=indent
+augroup xml
+    "autocmd FileType xml exe ":silent 1,$!xmllint --format --recover - 2>/dev/null"
+    autocmd FileType xml setlocal foldmethod=indent
+    autocmd FileType xml setlocal shiftwidth=2
+augroup END
 
 " java specific
-autocmd FileType java setlocal foldmethod=indent
-autocmd FileType java setlocal noexpandtab
-autocmd FileType vim setlocal foldmethod=indent
+augroup java
+    autocmd FileType java setlocal foldmethod=indent
+    autocmd FileType java setlocal noexpandtab
+    autocmd FileType vim setlocal foldmethod=indent
+augroup END
 
 augroup vimrcEx
   autocmd!
@@ -217,12 +223,13 @@ endif
 "" insert function boiler plate
 let @f='0y$O/64a*o**  Routine: po**** Summary:64i*A/ja = Func()Returns( ){};k'
 let @s='0i"A",'
+" map <leader>ds """^J^J        Parameters^J        ----------^J^J        Returns^J        -------^J        """^J
 
 "" make paragraph jump skip folds and not whitespace lines
 let g:ip_skipfold=1
 let g:ip_boundary='"\?\s*$'
 
-function MyDiff()
+function! MyDiff()
    let opt = '-a --binary '
    if &diffopt =~ 'icase' | let opt = opt . '-i ' | endif
    if &diffopt =~ 'iwhite' | let opt = opt . '-b ' | endif
@@ -255,22 +262,76 @@ set diffexpr=MyDiff()
 
 
 "Change read/only files to read/write when they are edited
-autocmd FileChangedRO * !start attrib -r %
-autocmd FileChangedRO * :let s:changedRO = 1
-autocmd FileChangedRO * :set noro
-
+augroup file_attr
+    autocmd FileChangedRO * !start attrib -r %
+    autocmd FileChangedRO * :let s:changedRO = 1
+    autocmd FileChangedRO * :set noro
+augroup END
 
 " Commenting blocks of code.
-autocmd FileType c,cpp,java,scala let b:comment_leader = '// '
-autocmd FileType sh,ruby,python   let b:comment_leader = '# '
-autocmd FileType conf,fstab       let b:comment_leader = '# '
-autocmd FileType make             let b:comment_leader = '# '
-autocmd FileType tex              let b:comment_leader = '% '
-autocmd FileType mail             let b:comment_leader = '> '
-autocmd FileType vim              let b:comment_leader = '" '
+let s:comment_map = {
+    \   "c": '\/\/',
+    \   "cpp": '\/\/',
+    \   "go": '\/\/',
+    \   "java": '\/\/',
+    \   "javascript": '\/\/',
+    \   "lua": '--',
+    \   "scala": '\/\/',
+    \   "php": '\/\/',
+    \   "python": '#',
+    \   "ruby": '#',
+    \   "rust": '\/\/',
+    \   "sh": '#',
+    \   "desktop": '#',
+    \   "fstab": '#',
+    \   "conf": '#',
+    \   "profile": '#',
+    \   "bashrc": '#',
+    \   "bash_profile": '#',
+    \   "mail": '>',
+    \   "make": '# ',
+    \   "eml": '>',
+    \   "bat": 'REM',
+    \   "ahk": ';',
+    \   "vim": '"',
+    \   "tex": '%',
+    \ }
+" \   "conf": '#',
+" \   "fstab": '#',
 
-noremap <silent> ,cc :<C-B>silent <C-E>s/\(\S\)/<C-R>=escape(b:comment_leader,'\/')<CR>\1/<CR> :nohlsearch<CR> :call histdel("search", -1)<CR>
-noremap <silent> ,cu :<C-B>silent <C-E>s/\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR> :nohlsearch<CR> :call histdel("search", -1)<CR>
+function! ToggleComment(what)
+    if has_key(s:comment_map, &filetype)
+        let comment_leader = s:comment_map[&filetype]
+        " if getline('.') =~ "^\\s*" . comment_leader
+        if a:what == 1
+            " Uncomment the line
+            execute "silent s/^\\(\\s*\\)" . comment_leader . "\\(\\s\\=\\)/\\1/"
+        elseif a:what == 0
+            " Comment the line
+            execute "silent s/^\\(\\s*\\)/\\1" . comment_leader . " /"
+        end
+    else
+        echo "No comment leader found for filetype"
+    end
+endfunction
+
+" toggle comments
+" nnoremap <silent> ,cc :call ToggleComment()<cr>
+" vnoremap <silent> ,cc :call ToggleComment()<cr>
+nnoremap <silent> ,cc :call ToggleComment(0)<cr>
+vnoremap <silent> ,cc :call ToggleComment(0)<cr>
+nnoremap <silent> ,cu :call ToggleComment(1)<cr>
+vnoremap <silent> ,cu :call ToggleComment(1)<cr>
+
+
+function! HighlightAcrossLines()
+    :<C-U>
+    let old_reg=getreg('"')
+    let old_regtype=getregtype('"')
+    gvy/<C-R><C-R>=substitute(
+    " \ escape(@", '/\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
+    gV:call setreg('"', old_reg, old_regtype)<CR>
+endfunction
 
 " Search for highlightd text, possibly over multiple lines
 vnoremap <silent> * :<C-U>
@@ -278,17 +339,17 @@ vnoremap <silent> * :<C-U>
   \gvy/<C-R><C-R>=substitute(
   \escape(@", '/\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
   \gV:call setreg('"', old_reg, old_regtype)<CR>
+
 vnoremap <silent> # :<C-U>
   \let old_reg=getreg('"')<Bar>let old_regtype=getregtype('"')<CR>
   \gvy?<C-R><C-R>=substitute(
   \escape(@", '?\.*$^~['), '\_s\+', '\\_s\\+', 'g')<CR><CR>
   \gV:call setreg('"', old_reg, old_regtype)<CR>
 
-
 " " for command mode
-" nnoremap <S-Tab> <<
+" nnoremap <shift><Tab> <<
 " " for insert mode
-" inoremap <S-Tab> <C-d>
+" inoremap <Shift><Tab> <C-d>
 
 func! DeleteTrailingWS()
   exe "normal mz"
@@ -296,7 +357,9 @@ func! DeleteTrailingWS()
   exe "normal `z"
 endfunc
 
-autocmd BufWrite * :call DeleteTrailingWS()
+augroup whitespace
+    autocmd BufWrite * :call DeleteTrailingWS()
+augroup END
 
 " Format xml
 func! FormatXML()
@@ -316,6 +379,40 @@ nmap :fx :call FormatXML()<CR>
 noremap <silent> ,/ :nohlsearch<CR>
 "" toggle paste mode
 noremap <silent> ,p :set paste!<CR>
+
+
+function! HiInterestingWord(n) " {{{
+    " Save our location.
+    normal! mz
+
+    " Yank the current word into the z register.
+    normal! "zyiw
+
+    " Calculate an arbitrary match ID.  Hopefully nothing else is using it.
+    let mid = 86750 + a:n
+
+    " Clear existing matches, but don't worry if they don't exist.
+    silent! call matchdelete(mid)
+
+    " Construct a literal pattern that has to match at boundaries.
+    let pat = '\V\<' . escape(@z, '\') . '\>'
+
+    " Actually match the words.
+    call matchadd("InterestingWord" . a:n, pat, 1, mid)
+
+    " Move back to our original location.
+    normal! `z
+endfunction " }}}
+
+
+" Mappings {{{
+
+nnoremap <silent> <leader>1 :call HiInterestingWord(1)<cr>
+nnoremap <silent> <leader>2 :call HiInterestingWord(2)<cr>
+nnoremap <silent> <leader>3 :call HiInterestingWord(3)<cr>
+nnoremap <silent> <leader>4 :call HiInterestingWord(4)<cr>
+nnoremap <silent> <leader>5 :call HiInterestingWord(5)<cr>
+nnoremap <silent> <leader>6 :call HiInterestingWord(6)<cr>
 
 
 "" syntastic checker, use :Errors and :lclose to show and close errors
@@ -345,9 +442,9 @@ call vundle#begin()
 Plugin 'gmarik/Vundle.vim'
 Plugin 'vim-scripts/indentpython.vim'
 Plugin 'scrooloose/syntastic'
-Plugin 'Align'
 Plugin 'highlight.vim'
 Plugin 'TagBar'
+Plugin 'Align'
 " Plugin 'Solarized'
 
 " All of your Plugins must be added before the following line

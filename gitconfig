@@ -3,8 +3,6 @@
 # Please adapt and uncomment the following lines:
 	name = dcollins
 	email = david.collins@gazprom-mt.com
-[credential]
-	helper = manager
 [alias]
 	co = checkout
 	st = status
@@ -23,3 +21,7 @@
 
 [init]
 	templatedir = ~/.git/template
+[flake8]
+    # strict = true
+[url "ssh://git@"]
+	insteadOf = http://
