@@ -34,7 +34,7 @@ set expandtab           " insert spaces in tabs
 set showmatch           " Show matching delimiters
 set showmode            " Show current input mode in status line
 set sidescroll=8        " Horizontal scrolling 8 columns at a time
-set ignorecase
+set ignorecase          " Case insensitive search use \C to switch off of a search
 set smartcase           " Ignore ignorecase for uppercase letters in patterns
 set splitbelow          " Split windows below current window
 set nostartofline       " Do not home cursor to beginning of line
@@ -49,13 +49,13 @@ set path=.,include,../include,../../include,/usr/local/include/g++,/usr/local/li
 set wildmode=longest,list	" Command line completion matches longest common
 set backup
 set showcmd
-set gcr=a:blinkon0
 set errorbells
 set visualbell
 set nowarn
 set hidden              " Allow edited files to be hidden
-set hlsearch
+set hlsearch            " Highlight search results
 set mouse=a             " Enable mouse to place cursor
+set nojoinspaces        " Use single space after full stop
 
 "" if wrapping is switched on indent the wrapped line
 set breakindent
@@ -77,6 +77,7 @@ let &showbreak=' '
 "set guicursor+=n-v-c:Cursor
 "set guicursor+=i:iCursor
 "set cursorline
+set gcr=a:blinkon0
 
 " tell vim where to find tag file
 " set tags=./.git/tags;,.git/tags;
@@ -445,6 +446,7 @@ Plugin 'scrooloose/syntastic'
 Plugin 'highlight.vim'
 Plugin 'TagBar'
 Plugin 'Align'
+Plugin 'Jinja'
 " Plugin 'Solarized'
 
 " All of your Plugins must be added before the following line
