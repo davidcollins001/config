@@ -21,7 +21,7 @@ set bioskey             " Use PC BIOS to read keyboard, for better ^C detection
 set helpheight=15	" 15 lines of help is enough, thank you
 "set infercase           " Infer case for ignorecase keyword completion
 "set keywordprg=man\ -a  " Display all man entries for `K' lookup
-set statusline=%<%F%h%m%r%=\[%B\]\ %l,%c%V\ %P
+set statusline=%<%F%h%m%r%=\[%n\]\ %l,%c%V\ %P
 set laststatus=2        " Always show a status line
 "set notextmode          " Don't append bloody carriage returns
 set ruler               " Enable ruler on status line
@@ -178,8 +178,8 @@ augroup python
     "autocmd FileType python setlocal nosmartindent autoindent
     "autocmd FileType python setlocal nosmartindent
     " add breakpoint using \(b|B)
-    autocmd FileType python noremap <silent> <leader>b oimport pdb; pdb.set_trace()  # noqa: E702<esc>
-    autocmd FileType python noremap <silent> <leader>B Oimport pdb; pdb.set_trace()  # noqa: E702<esc>
+    autocmd FileType python noremap <silent> <leader>b oimport pdb; pdb.set_trace()  # noqa: E702, F402<esc>
+    autocmd FileType python noremap <silent> <leader>B Oimport pdb; pdb.set_trace()  # noqa: E702, F402<esc>
 
     " set cython filetypes as python
     autocmd BufNewFile,BufRead *.pyx setlocal filetype=python
@@ -306,10 +306,12 @@ function! ToggleComment(what)
         " if getline('.') =~ "^\\s*" . comment_leader
         if a:what == 1
             " Uncomment the line
-            execute "silent s/^\\(\\s*\\)" . comment_leader . "\\(\\s\\=\\)/\\1/"
+            execute "silent! s/^\\(\\s*\\)" . comment_leader . "\\(\\s\\=\\)/\\1/"
         elseif a:what == 0
-            " Comment the line
-            execute "silent s/^\\(\\s*\\)/\\1" . comment_leader . " /"
+            " Comment non blank lines
+            if getline('.') !~ '^$'
+                execute "silent s/^\\(\\s*\\)/\\1" . comment_leader . " /"
+            endif
         end
     else
         echo "No comment leader found for filetype"
