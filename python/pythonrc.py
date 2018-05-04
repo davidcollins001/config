@@ -13,7 +13,7 @@ def _completion():
     import atexit
     import os
     import readline
-    import rlcompleter
+    import rlcompleter  # noqa: F401
     import sys
 
     readline.parse_and_bind('tab: complete')
@@ -43,11 +43,3 @@ try:
 except Exception:
     import sys
     print >>sys.stderr, "Couldn't get completion and history working."
-
-
-# try:
-    # from see import see
-# except ImportError:
-    # import sys
-    # print >>sys.stderr, "Please pip install see"
-

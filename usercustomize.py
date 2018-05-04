@@ -1,4 +1,5 @@
 
+# this file is hardlinked (mklink /H on cmd) because windows python can't read symlink
 # https://www.usenix.org/system/files/login/articles/09beazley_061-068_online.pdf
 
 import os
@@ -18,14 +19,15 @@ class GMTLoader(object):
     Import hook to resolve local Python imports. Will search in `REPO_ROOT` for
     """
     def __init__(self):
-        self._local_repos = None
+        self._local_repos = []
 
     def local_repos(self, path=REPO_ROOT):
-        # TODO: needs to recurse into dir to find __init__.py otherwise it might
-        #       not be the top level of the code, eg pyserialise
+        """Find local repos by searching `REPO_ROOT` to find all packages"""
 
         # find root import path for repos
         def find_root(path, f):
+            # recurse into dir to find __init__.py to determine top level of
+            # code eg pyserialise
             repo = os.path.join(path, f)
             if os.path.isdir(repo) and not f.startswith('.'):
                 subdirs = os.listdir(repo)
@@ -42,7 +44,6 @@ class GMTLoader(object):
         if self._local_repos:
             return self._local_repos
 
-        self._local_repos = []
         for f in os.listdir(path):
             repo = find_root(path, f)
             if repo:
@@ -50,7 +51,7 @@ class GMTLoader(object):
 
         return self._local_repos
 
-    def find_module(self, name, dir_):
+    def find_module(self, name, path):
         """
         Search for a package in local repo path that has a location which
         maps to `name`
@@ -59,10 +60,23 @@ class GMTLoader(object):
         if "importlib" in name:
             return self
 
+        # TODO: use dir_
         # search local repos to find the path to load the module from
-        repos = self.local_repos()
+        if path:
+            # TODO: strip name from path to get root path
+            # repos = [path]
+            repos = self.local_repos()
+        else:
+            repos = self.local_repos()
+
         for repo in repos:
-            if os.path.isdir(os.path.join(REPO_ROOT, repo, *name.split('.'))):
+            # check path exists in "repo" and is a package
+            if(os.path.isdir(os.path.join(REPO_ROOT, repo,
+                                          *name.split('.'))) and
+               os.path.isfile(
+                   os.path.join(os.path.join(
+                       REPO_ROOT, repo, *name.split('.')
+                   ), "__init__.py"))):
                 if VERBOSE:
                     print "found repo matching \"{}\" in {}".format(
                         name, os.path.join(REPO_ROOT, repo, *name.split('.'))
@@ -82,20 +96,25 @@ class GMTLoader(object):
             return self
 
         mod_path = []
-        file_path = [self.repo_path]
         # split the full import name and import each part separately
         # so import gmt.grid requires importing gmt then gmt.grid
         for n in name.split('.'):
+            # build intermediate module path to be imported
             mod_path.append(n)
             mod_path_str = '.'.join(mod_path)
 
-            module = imp.find_module(n, [os.path.join(*file_path)])
-            if VERBOSE:
-                print "loading module \"{}\" from {}".format(
-                    mod_path_str, os.path.join(*file_path)
-                )
-            file_path.append(n)
-            m = imp.load_module(mod_path_str, *module)
+            # already imported up to `n` so don't need to import again
+            if mod_path_str in sys.modules:
+                m = sys.modules[mod_path_str]
+            else:
+                module = imp.find_module(n, [os.path.join(self.repo_path,
+                                                          *mod_path[:-1])])
+                if VERBOSE:
+                    print "loading module \"{}\" from {}".format(
+                        mod_path_str, os.path.join(self.repo_path,
+                                                   *mod_path[:-1])
+                    )
+                m = imp.load_module(mod_path_str, *module)
         return m
 
     def import_module(self, name, package=None):
@@ -104,23 +123,28 @@ class GMTLoader(object):
         importlib in python2 only supports import_module so emulate that
         functionality here, ie, find the module and load it
         """
-        if VERBOSE:
-            print "intercept importlib.import_module() for {}:{}".format(
-                name, package
-            )
-
-        # get the file path of the caller for imp to find the module to import
-        import inspect
-        file_ = os.path.dirname(inspect.stack()[1][1])
-
-        # NOTE: setting this is only needed in one place with relative import
-        #       it might break with full path
-        # set path for load_module to use for root import
-        self.repo_path = file_
-
         # relative import and have path already so remove '.'
+        # build full package import
+        fullname = name
+        package = package or ''
+
         if name.startswith('.'):
+            fullname = "{}{}".format(package or '', name)
             name = name[1:]
+
+        # search local repos for repo with path `package`.`name`
+        for repo in self.local_repos():
+            if os.path.isdir(os.path.join(repo, *fullname.split('.'))):
+                self.repo_path = os.path.join(
+                    repo, *(package or '').split('.')
+                )
+                break
+
+        if VERBOSE:
+            print "intercept importlib.import_module() for {} ({}) from {}" \
+                .format(
+                    name, package, self.repo_path
+                )
 
         return self.load_module(name)
 
@@ -182,4 +206,6 @@ class ShortcutLoader(GMTLoader):
 
 # import hook to preferentially load git repos rather than site-packages
 sys.meta_path.append(GMTLoader())
+
+# redirect structuring imports if link wasn't created with mklink /J
 # sys.meta_path.append(ShortcutLoader())
