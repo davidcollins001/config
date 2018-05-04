@@ -26,3 +26,8 @@
     ignore = E114,E116,E265,E266,E127,E128,W391,W503
 [url "ssh://git@"]
 	insteadOf = http://
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true

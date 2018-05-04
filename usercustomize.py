@@ -8,6 +8,7 @@ import imp
 import pythoncom
 import pywintypes
 from win32com.shell import shell
+from functools32 import lru_cache
 
 
 REPO_ROOT = 'c:/dev/code/gazprom.mt'
@@ -18,9 +19,7 @@ class GMTLoader(object):
     """
     Import hook to resolve local Python imports. Will search in `REPO_ROOT` for
     """
-    def __init__(self):
-        self._local_repos = []
-
+    @lru_cache()
     def local_repos(self, path=REPO_ROOT):
         """Find local repos by searching `REPO_ROOT` to find all packages"""
 
@@ -41,35 +40,28 @@ class GMTLoader(object):
                     if pp:
                         return pp
 
-        if self._local_repos:
-            return self._local_repos
-
+        local_repos = []
         for f in os.listdir(path):
             repo = find_root(path, f)
             if repo:
-                self._local_repos.append(repo)
+                local_repos.append(repo)
 
-        return self._local_repos
+        return local_repos
 
-    def find_module(self, name, path):
+    def find_module(self, name, paths):
         """
         Search for a package in local repo path that has a location which
         maps to `name`
+
+        Note: using paths doesn't add any performance and python sometimes sends
+        us the wrong path anyway.
         """
         # capture call to importlib because it breaks this import hook
         if "importlib" in name:
             return self
 
-        # TODO: use dir_
         # search local repos to find the path to load the module from
-        if path:
-            # TODO: strip name from path to get root path
-            # repos = [path]
-            repos = self.local_repos()
-        else:
-            repos = self.local_repos()
-
-        for repo in repos:
+        for repo in self.local_repos():
             # check path exists in "repo" and is a package
             if(os.path.isdir(os.path.join(REPO_ROOT, repo,
                                           *name.split('.'))) and
@@ -97,7 +89,7 @@ class GMTLoader(object):
 
         mod_path = []
         # split the full import name and import each part separately
-        # so import gmt.grid requires importing gmt then gmt.grid
+        # so import a.b.c requires importing a then a.b and finally a.b.c
         for n in name.split('.'):
             # build intermediate module path to be imported
             mod_path.append(n)
@@ -109,6 +101,7 @@ class GMTLoader(object):
             else:
                 module = imp.find_module(n, [os.path.join(self.repo_path,
                                                           *mod_path[:-1])])
+
                 if VERBOSE:
                     print "loading module \"{}\" from {}".format(
                         mod_path_str, os.path.join(self.repo_path,
