@@ -132,6 +132,10 @@ class GMTLoader(object):
                     repo, *(package or '').split('.')
                 )
                 break
+        else:
+            # importing module not in a local repo, default to search sys.path
+            module = imp.find_module(name, sys.path)
+            return imp.load_module(name, *module)
 
         if VERBOSE:
             print "intercept importlib.import_module() for {} ({}) from {}" \
