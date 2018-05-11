@@ -127,10 +127,9 @@ class GMTLoader(object):
 
         # search local repos for repo with path `package`.`name`
         for repo in self.local_repos():
-            if os.path.isdir(os.path.join(repo, *fullname.split('.'))):
-                self.repo_path = os.path.join(
-                    repo, *(package or '').split('.')
-                )
+            path = os.path.join(repo, *fullname.split('.'))
+            if(os.path.isdir(path) or os.path.isfile("{}.py".format(path))):
+                self.repo_path = os.path.join(repo, *(package or '').split('.'))
                 break
         else:
             # importing module not in a local repo, default to search sys.path
