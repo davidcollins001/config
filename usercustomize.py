@@ -10,9 +10,7 @@ import pywintypes
 from win32com.shell import shell
 from functools32 import lru_cache
 
-
 REPO_ROOT = 'c:/dev/code/gazprom.mt'
-VERBOSE = os.environ.get("VERBOSE")
 
 
 class GMTLoader(object):
@@ -31,7 +29,7 @@ class GMTLoader(object):
             if os.path.isdir(repo) and not f.startswith('.'):
                 subdirs = os.listdir(repo)
                 if "__init__.py" in subdirs:
-                    if VERBOSE:
+                    if os.environ.get("VERBOSE"):
                         print "found repo path: {}".format(path)
                     return path
 
@@ -56,6 +54,12 @@ class GMTLoader(object):
         Note: using paths doesn't add any performance and python sometimes sends
         us the wrong path anyway.
         """
+        # print name, '\t', paths
+        blacklist = os.environ.get("IMPORT_BLACKLIST", "").split(":")
+        if any([b for b in blacklist if name.startswith(b)]):
+            print '--', name, blacklist
+            return
+
         # capture call to importlib because it breaks this import hook
         if "importlib" in name:
             return self
@@ -69,14 +73,15 @@ class GMTLoader(object):
                    os.path.join(os.path.join(
                        REPO_ROOT, repo, *name.split('.')
                    ), "__init__.py"))):
-                if VERBOSE:
+                if os.environ.get("VERBOSE"):
                     print "found repo matching \"{}\" in {}".format(
-                        name, os.path.join(REPO_ROOT, repo, *name.split('.'))
+                        name, os.path.join(REPO_ROOT, repo,
+                                           *name.split('.'))
                     )
                 self.repo_path = os.path.join(REPO_ROOT, repo)
                 return self
 
-    def load_module(self, name):
+    def load_module(self, name, package=None):
         """
         Load module from repo path found in `find_module()`. `name` is full
         dotted import path, each part of path must separately be imported to be
@@ -102,12 +107,16 @@ class GMTLoader(object):
                 module = imp.find_module(n, [os.path.join(self.repo_path,
                                                           *mod_path[:-1])])
 
-                if VERBOSE:
+                if os.environ.get("VERBOSE"):
                     print "loading module \"{}\" from {}".format(
                         mod_path_str, os.path.join(self.repo_path,
                                                    *mod_path[:-1])
                     )
-                m = imp.load_module(mod_path_str, *module)
+                # prepend package name if imported using import_module
+                path_str = mod_path_str
+                if package:
+                    path_str = "{}.{}".format(package, mod_path_str)
+                m = imp.load_module(path_str, *module)
         return m
 
     def import_module(self, name, package=None):
@@ -136,13 +145,13 @@ class GMTLoader(object):
             module = imp.find_module(name, sys.path)
             return imp.load_module(name, *module)
 
-        if VERBOSE:
+        if os.environ.get("VERBOSE"):
             print "intercept importlib.import_module() for {} ({}) from {}" \
                 .format(
                     name, package, self.repo_path
                 )
 
-        return self.load_module(name)
+        return self.load_module(name, package=package)
 
 
 class ShortcutLoader(GMTLoader):
@@ -174,7 +183,6 @@ class ShortcutLoader(GMTLoader):
         return linked_to_file
 
     def find_module(self, name, dir_):
-
         if 'structuring' in name:
 
             dirs = [f for f in os.listdir(REPO_ROOT)
@@ -187,7 +195,7 @@ class ShortcutLoader(GMTLoader):
                 try:
                     self.repo_path = self.resolve_shortcut(p)
                     self.repo_path = os.path.split(self.repo_path)[0]
-                    if VERBOSE:
+                    if os.environ.get("VERBOSE"):
                         print "redirecting repo {} from {} to {}".format(
                             name, p, self.repo_path
                         )
