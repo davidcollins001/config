@@ -46,7 +46,7 @@ class GMTLoader(object):
 
         return local_repos
 
-    def find_module(self, name, paths):
+    def find_module(self, name, paths=None):
         """
         Search for a package in local repo path that has a location which
         maps to `name`
@@ -54,10 +54,9 @@ class GMTLoader(object):
         Note: using paths doesn't add any performance and python sometimes sends
         us the wrong path anyway.
         """
-        # print name, '\t', paths
+        # if a module is listed in IMPORT_BLACKLIST import site package
         blacklist = os.environ.get("IMPORT_BLACKLIST", "").split(":")
         if any([b for b in blacklist if name.startswith(b)]):
-            print '--', name, blacklist
             return
 
         # capture call to importlib because it breaks this import hook
