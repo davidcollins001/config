@@ -140,8 +140,13 @@ class GMTLoader(object):
                 self.repo_path = os.path.join(repo, *(package or '').split('.'))
                 break
         else:
-            # importing module not in a local repo, default to search sys.path
-            module = imp.find_module(name, sys.path)
+            # can't find module in local repo, default to search sys.path
+            # unless special name
+            path = sys.path
+            if name.startswith("__"):
+                path = None
+
+            module = imp.find_module(name, path)
             return imp.load_module(name, *module)
 
         if os.environ.get("VERBOSE"):
