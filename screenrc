@@ -242,6 +242,7 @@ bind ^] paste [.]
 # bind _ resize max
 #
 # defnonblock 1
+nonblock 5
 # blankerprg rain -d 100
 # idle 30 blanker
 
