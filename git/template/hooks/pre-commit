@@ -1,39 +1,12 @@
 #!c:\dev\bin\anaconda\python.exe
 import sys
-import subprocess
+
 from flake8.main import git
 
-
-def check_pep8():
-    return git.hook(
-        strict=git.config_for('strict'),
-        lazy=git.config_for('lazy'),
-    )
-
-
-def piped_process(command):
-    return subprocess.Popen(
-        command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-
-
-def check_pdb():
-    """Check commit diff for any debugging/pdb statements"""
-
-    diff_cmd = ['git', 'diff', '--cached']
-
-    diff = piped_process(diff_cmd)
-    (stdout, _) = diff.communicate()
-
-    for line in stdout.split('\n'):
-        if line.startswith('+') and "pdb.set_trace()" in line:
-            print "** Remove debug line **"
-            return 1
-
-    return 0
-
-
 if __name__ == '__main__':
-    sys.exit(check_pep8() or check_pdb())
+    sys.exit(
+        git.hook(
+            strict=git.config_for('strict'),
+            lazy=git.config_for('lazy'),
+        )
+    )
