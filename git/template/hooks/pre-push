@@ -28,4 +28,4 @@ def check_pdb():
 
 
 if __name__ == '__main__':
-    sys.exit(check_pep8() or check_pdb())
+    sys.exit(check_pdb())

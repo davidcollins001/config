@@ -5,18 +5,19 @@
 import os
 import sys
 import imp
-import pythoncom
-import pywintypes
-from win32com.shell import shell
 from functools32 import lru_cache
 
 REPO_ROOT = 'c:/dev/code/gazprom.mt'
 
 
+# TODO: add locks
 class GMTLoader(object):
     """
     Import hook to resolve local Python imports. Will search in `REPO_ROOT` for
     """
+    def __init__(self):
+        self.repo_path = None
+
     @lru_cache()
     def local_repos(self, path=REPO_ROOT):
         """Find local repos by searching `REPO_ROOT` to find all packages"""
@@ -54,6 +55,12 @@ class GMTLoader(object):
         Note: using paths doesn't add any performance and python sometimes sends
         us the wrong path anyway.
         """
+        # # if "gazprom" in name or "gmt" in name:
+        # if "gazprom" in name:
+            # from pprint import pprint as pp
+            # print '--->', name
+            # pp(paths)
+
         # if a module is listed in IMPORT_BLACKLIST import site package
         blacklist = os.environ.get("IMPORT_BLACKLIST", "").split(":")
         if any([b for b in blacklist if name.startswith(b)]):
@@ -61,6 +68,9 @@ class GMTLoader(object):
 
         # capture call to importlib because it breaks this import hook
         if "importlib" in name:
+            return self
+
+        if "matplotlib.pyplot" in name:
             return self
 
         # search local repos to find the path to load the module from
@@ -91,7 +101,18 @@ class GMTLoader(object):
         if "importlib" in name:
             return self
 
-        mod_path = []
+        if "matplotlib.pyplot" in name:
+            msg = "replacing {} with dummy function".format(name)
+            print msg.center(len(name) + 6, "*")
+            def dummy(*a, **k):
+                pass
+            return dummy
+
+        return self._load_module(name, package=package)
+
+    def _load_module(self, name, package=None):
+        """Actually do the import of name"""
+        m, mod_path = None, []
         # split the full import name and import each part separately
         # so import a.b.c requires importing a then a.b and finally a.b.c
         for n in name.split('.'):
@@ -103,19 +124,31 @@ class GMTLoader(object):
             if mod_path_str in sys.modules:
                 m = sys.modules[mod_path_str]
             else:
-                module = imp.find_module(n, [os.path.join(self.repo_path,
-                                                          *mod_path[:-1])])
+                # select correct path, either a local repo, the path of the last
+                # module imported or system path
+                if self.repo_path:
+                    p = [os.path.join(self.repo_path, *mod_path[:-1])]
+                elif m:
+                    p = [os.path.dirname(m.__file__)]
+                else:
+                    p = sys.path
+
+                # only need module name, ie a, b or c from import a.b.c
+                module = imp.find_module(n, p)
 
                 if os.environ.get("VERBOSE"):
                     print "loading module \"{}\" from {}".format(
-                        mod_path_str, os.path.join(self.repo_path,
-                                                   *mod_path[:-1])
+                        mod_path_str, os.path.join(p)
                     )
                 # prepend package name if imported using import_module
                 path_str = mod_path_str
                 if package:
                     path_str = "{}.{}".format(package, mod_path_str)
+                # load module needs full path, ie a, a.b or a.b.c
                 m = imp.load_module(path_str, *module)
+
+        # this may not be needed
+        self.repo_path = None
         return m
 
     def import_module(self, name, package=None):
@@ -140,14 +173,7 @@ class GMTLoader(object):
                 self.repo_path = os.path.join(repo, *(package or '').split('.'))
                 break
         else:
-            # can't find module in local repo, default to search sys.path
-            # unless special name
-            path = sys.path
-            if name.startswith("__"):
-                path = None
-
-            module = imp.find_module(name, path)
-            return imp.load_module(name, *module)
+            return self._load_module(name, package=package)
 
         if os.environ.get("VERBOSE"):
             print "intercept importlib.import_module() for {} ({}) from {}" \
@@ -158,62 +184,61 @@ class GMTLoader(object):
         return self.load_module(name, package=package)
 
 
-class ShortcutLoader(GMTLoader):
-    """Import hook to resolve Python imports through Windows shortcuts"""
+class MultiRootLoader(object):
 
-    def get_shortcut_paths(self, directory):
-        """get_shortcut_paths("Programs") => ["...\Internet Explorer.lnk", ...]
+    def find_module(self, name, paths=None):
 
-        Returns the list of Windows shortcuts contained in a directory.
+        site_path = site.getsitepackages()
+        code_path = "{}/{}".format(REPO_ROOT, name.rsplit('.')[-1])
+
+        # set path for site/code package import
+        m = {
+            'gazprom.mt.foo': site_path,
+            # 'gazprom.mt.pricing': site_path,
+            'gazprom.mt.pricing': code_path,
+            'gazprom.mt.structuring': code_path,
+        }
+
+        path = m.get(name)
+        if path:
+            self.repo_path = path
+            return self
+
+    def load_module(self, name, package=None):
         """
-        return [os.path.join(directory, f) for f in os.listdir(directory)
-                if os.path.splitext(f)[1] == '.lnk']
-
-    def resolve_shortcut(self, filename):
-        """resolve_shortcut("Notepad.lnk") => "C:\WINDOWS\system32\notepad.exe"
-
-        Returns the path refered to by a windows shortcut (.lnk) file.
+        Load module from repo path found in `find_module()`. `name` is full
+        dotted import path, each part of path must separately be imported to be
+        able to find the next part of the package, eg, gazprom.mt.pricing:
+        gazprom must be imported, then mt and finally pricing
         """
-        shell_link = pythoncom.CoCreateInstance(
-            shell.CLSID_ShellLink, None,
-            pythoncom.CLSCTX_INPROC_SERVER, shell.IID_IShellLink)
 
-        persistant_file = shell_link.QueryInterface(pythoncom.IID_IPersistFile)
+        mod_path = []
+        # split the full import name and import each part separately
+        # so import a.b.c requires importing a then a.b and finally a.b.c
+        for n in name.split('.'):
+            # build intermediate module path to be imported
+            mod_path.append(n)
+            mod_path_str = '.'.join(mod_path)
 
-        persistant_file.Load(filename)
+            # already imported up to `n` so don't need to import again
+            module = imp.find_module(n, [os.path.join(self.repo_path,
+                                                      *mod_path[:-1])])
 
-        shell_link.Resolve(0, 0)
-        linked_to_file = shell_link.GetPath(shell.SLGP_UNCPRIORITY)[0]
-        return linked_to_file
-
-    def find_module(self, name, dir_):
-        if 'structuring' in name:
-
-            dirs = [f for f in os.listdir(REPO_ROOT)
-                    if os.path.isdir(os.path.join(REPO_ROOT, f))]
-
-            for d in dirs:
-                p = os.path.join(REPO_ROOT, d, *name.split('.')) + ".lnk"
-                # windows shortcuts not supported properly, ie os.path.islink
-                # doesn't work
-                try:
-                    self.repo_path = self.resolve_shortcut(p)
-                    self.repo_path = os.path.split(self.repo_path)[0]
-                    if os.environ.get("VERBOSE"):
-                        print "redirecting repo {} from {} to {}".format(
-                            name, p, self.repo_path
-                        )
-                    return self
-                except pywintypes.com_error:
-                    pass
-
-    def load_module(self, name):
-        actual_name = name.split(".")[-1]
-        return super(ShortcutLoader, self).load_module(actual_name)
+            if os.environ.get("VERBOSE"):
+                print "loading module \"{}\" from {}".format(
+                    mod_path_str, os.path.join(self.repo_path,
+                                               *mod_path[:-1])
+                )
+            # prepend package name if imported using import_module
+            path_str = mod_path_str
+            if package:
+                path_str = "{}.{}".format(package, mod_path_str)
+            m = imp.load_module(path_str, *module)
+        return m
 
 
 # import hook to preferentially load git repos rather than site-packages
 sys.meta_path.append(GMTLoader())
 
-# redirect structuring imports if link wasn't created with mklink /J
-# sys.meta_path.append(ShortcutLoader())
+# imports for packages which have multiple roots
+# sys.meta_path.append(MultiRootLoader())
