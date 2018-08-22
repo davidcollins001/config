@@ -7,7 +7,9 @@ import sys
 import imp
 from functools32 import lru_cache
 
-REPO_ROOT = 'c:/dev/code/gazprom.mt'
+# sanitise environment paths with normpath
+REPO_ROOT = os.path.normcase('c:/dev/code/gazprom.mt')
+CONDA_ENV_ROOT = os.path.normcase('c:/dev/bin/Anaconda/envs')
 
 
 # TODO: add locks
@@ -55,37 +57,29 @@ class GMTLoader(object):
         Note: using paths doesn't add any performance and python sometimes sends
         us the wrong path anyway.
         """
-        # # if "gazprom" in name or "gmt" in name:
-        # if "gazprom" in name:
-            # from pprint import pprint as pp
-            # print '--->', name
-            # pp(paths)
+        # running with conda env - imports should not use checked out code
+        if CONDA_ENV_ROOT in os.path.normcase(sys.executable):
+            return
 
         # if a module is listed in IMPORT_BLACKLIST import site package
         blacklist = os.environ.get("IMPORT_BLACKLIST", "").split(":")
         if any([b for b in blacklist if name.startswith(b)]):
             return
 
-        # capture call to importlib because it breaks this import hook
-        if "importlib" in name:
-            return self
-
-        if "matplotlib.pyplot" in name:
+        # capture calls to importlib because it breaks this import hook
+        if name in ["importlib", "matplotlib.pyplot"]:
             return self
 
         # search local repos to find the path to load the module from
         for repo in self.local_repos():
             # check path exists in "repo" and is a package
-            if(os.path.isdir(os.path.join(REPO_ROOT, repo,
-                                          *name.split('.'))) and
-               os.path.isfile(
-                   os.path.join(os.path.join(
-                       REPO_ROOT, repo, *name.split('.')
-                   ), "__init__.py"))):
+            repo_root = os.path.join(REPO_ROOT, repo, *name.split('.'))
+            isfile = os.path.isfile(os.path.join(repo_root, "__init__.py"))
+            isdir = os.path.isdir(repo_root)
+            if isfile and isdir:
                 if os.environ.get("VERBOSE"):
                     print "found repo matching \"{}\" in {}".format(
-                        name, os.path.join(REPO_ROOT, repo,
-                                           *name.split('.'))
+                        name, repo_root
                     )
                 self.repo_path = os.path.join(REPO_ROOT, repo)
                 return self
@@ -104,6 +98,7 @@ class GMTLoader(object):
         if "matplotlib.pyplot" in name:
             msg = "replacing {} with dummy function".format(name)
             print msg.center(len(name) + 6, "*")
+
             def dummy(*a, **k):
                 pass
             return dummy
@@ -173,6 +168,7 @@ class GMTLoader(object):
                 self.repo_path = os.path.join(repo, *(package or '').split('.'))
                 break
         else:
+            self.repo_path = None
             return self._load_module(name, package=package)
 
         if os.environ.get("VERBOSE"):
@@ -188,6 +184,7 @@ class MultiRootLoader(object):
 
     def find_module(self, name, paths=None):
 
+        import site
         site_path = site.getsitepackages()
         code_path = "{}/{}".format(REPO_ROOT, name.rsplit('.')[-1])
 
