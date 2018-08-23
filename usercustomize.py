@@ -73,13 +73,14 @@ class GMTLoader(object):
         # search local repos to find the path to load the module from
         for repo in self.local_repos():
             # check path exists in "repo" and is a package
-            repo_root = os.path.join(REPO_ROOT, repo, *name.split('.'))
-            isfile = os.path.isfile(os.path.join(repo_root, "__init__.py"))
-            isdir = os.path.isdir(repo_root)
-            if isfile and isdir:
+            name_path = os.path.join(REPO_ROOT, repo, *name.split('.'))
+            ismodule = os.path.isfile(os.path.join(name_path) + ".py")
+            isfile = os.path.isfile(os.path.join(name_path, "__init__.py"))
+            isdir = os.path.isdir(name_path)
+            if ismodule or isfile and isdir:
                 if os.environ.get("VERBOSE"):
                     print "found repo matching \"{}\" in {}".format(
-                        name, repo_root
+                        name, name_path
                     )
                 self.repo_path = os.path.join(REPO_ROOT, repo)
                 return self
