@@ -16,6 +16,15 @@ CONDA_ENV_ROOT = os.path.normcase('c:/dev/bin/Anaconda/envs')
 class GMTLoader(object):
     """
     Import hook to resolve local Python imports. Will search in `REPO_ROOT` for
+
+    environment variables that changes the behaviour
+    VERBOSE: print more info
+    IMPORT_BLACKLIST: colon separated list of import names to ignore
+        eg IMPORT_BLACKLIST gmt.grid:gmt.quant.util will mean these two
+        libraries get imported from site-packages
+    REPOS: colon separated list of windows paths to prepend on the search path,
+        this causes that path to preferentially be searched for import
+
     """
     def __init__(self):
         self.repo_path = None
@@ -66,18 +75,22 @@ class GMTLoader(object):
         if any([b for b in blacklist if name.startswith(b)]):
             return
 
+        # prepend user specified repos
+        prepend = os.environ.get("REPOS", "").split(":")
+        local_repos = prepend + self.local_repos()
+
         # capture calls to importlib because it breaks this import hook
         if name in ["importlib", "matplotlib.pyplot"]:
             return self
 
         # search local repos to find the path to load the module from
-        for repo in self.local_repos():
+        for repo in local_repos:
             # check path exists in "repo" and is a package
             name_path = os.path.join(REPO_ROOT, repo, *name.split('.'))
-            ismodule = os.path.isfile(os.path.join(name_path) + ".py")
+            # ismodule = os.path.isfile(os.path.join(name_path) + ".py")
             isfile = os.path.isfile(os.path.join(name_path, "__init__.py"))
             isdir = os.path.isdir(name_path)
-            if ismodule or isfile and isdir:
+            if isfile and isdir:
                 if os.environ.get("VERBOSE"):
                     print "found repo matching \"{}\" in {}".format(
                         name, name_path
@@ -158,12 +171,16 @@ class GMTLoader(object):
         fullname = name
         package = package or ''
 
+        # prepend user specified repos
+        prepend = os.environ.get("REPOS", "").split(":")
+        local_repos = prepend + self.local_repos()
+
         if name.startswith('.'):
             fullname = "{}{}".format(package or '', name)
             name = name[1:]
 
         # search local repos for repo with path `package`.`name`
-        for repo in self.local_repos():
+        for repo in local_repos:
             path = os.path.join(repo, *fullname.split('.'))
             if(os.path.isdir(path) or os.path.isfile("{}.py".format(path))):
                 self.repo_path = os.path.join(repo, *(package or '').split('.'))
