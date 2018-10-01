@@ -7,9 +7,18 @@ import sys
 import imp
 from functools32 import lru_cache
 
+# seperator for user input
+SEP = ":"
+
 # sanitise environment paths with normpath
 REPO_ROOT = os.path.normcase('c:/dev/code/gazprom.mt')
-CONDA_ENV_ROOT = os.path.normcase('c:/dev/bin/Anaconda/envs')
+CONDA_ENV_ROOT = (os.environ.get('CONDA_ENV_ROOT') or
+                  os.path.normcase('c:/dev/bin/Anaconda/envs'))
+VERBOSE = os.environ.get("VERBOSE")
+IMPORT_BLACKLIST = os.environ.get("IMPORT_BLACKLIST", "")
+REPOS = os.environ.get("REPOS", "")
+
+IGNORE = ['build', 'dist']
 
 
 # TODO: add locks
@@ -35,18 +44,18 @@ class GMTLoader(object):
 
         # find root import path for repos
         def find_root(path, f):
-            # recurse into dir to find __init__.py to determine top level of
-            # code eg pyserialise
+            # recurse into dir to find setup.py to determine top level of code
+            # eg pyserialise
             repo = os.path.join(path, f)
             if os.path.isdir(repo) and not f.startswith('.'):
                 subdirs = os.listdir(repo)
-                if "__init__.py" in subdirs:
-                    if os.environ.get("VERBOSE"):
-                        print "found repo path: {}".format(path)
-                    return path
+                if "setup.py" in subdirs:  # and f not in IGNORE:
+                    if VERBOSE:
+                        print "found repo path: {}".format(repo)
+                    return repo
 
                 for sub in subdirs:
-                    pp = find_root(os.path.join(path, f), sub)
+                    pp = find_root(repo, sub)
                     if pp:
                         return pp
 
@@ -71,12 +80,12 @@ class GMTLoader(object):
             return
 
         # if a module is listed in IMPORT_BLACKLIST import site package
-        blacklist = os.environ.get("IMPORT_BLACKLIST", "").split(":")
+        blacklist = IMPORT_BLACKLIST.split(SEP)
         if any([b for b in blacklist if name.startswith(b)]):
             return
 
         # prepend user specified repos
-        prepend = os.environ.get("REPOS", "").split(":")
+        prepend = REPOS.split(SEP)
         local_repos = prepend + self.local_repos()
 
         # capture calls to importlib because it breaks this import hook
@@ -91,7 +100,7 @@ class GMTLoader(object):
             isfile = os.path.isfile(os.path.join(name_path, "__init__.py"))
             isdir = os.path.isdir(name_path)
             if isfile and isdir:
-                if os.environ.get("VERBOSE"):
+                if VERBOSE:
                     print "found repo matching \"{}\" in {}".format(
                         name, name_path
                     )
@@ -145,9 +154,9 @@ class GMTLoader(object):
                 # only need module name, ie a, b or c from import a.b.c
                 module = imp.find_module(n, p)
 
-                if os.environ.get("VERBOSE"):
+                if VERBOSE:
                     print "loading module \"{}\" from {}".format(
-                        mod_path_str, os.path.join(p)
+                        mod_path_str, os.path.join(*p)
                     )
                 # prepend package name if imported using import_module
                 path_str = mod_path_str
@@ -172,7 +181,7 @@ class GMTLoader(object):
         package = package or ''
 
         # prepend user specified repos
-        prepend = os.environ.get("REPOS", "").split(":")
+        prepend = REPOS.split(SEP)
         local_repos = prepend + self.local_repos()
 
         if name.startswith('.'):
@@ -189,13 +198,16 @@ class GMTLoader(object):
             self.repo_path = None
             return self._load_module(name, package=package)
 
-        if os.environ.get("VERBOSE"):
+        if VERBOSE:
             print "intercept importlib.import_module() for {} ({}) from {}" \
                 .format(
                     name, package, self.repo_path
                 )
 
         return self.load_module(name, package=package)
+
+    def is_package(self, name):
+        return True
 
 
 class MultiRootLoader(object):
@@ -239,7 +251,7 @@ class MultiRootLoader(object):
             module = imp.find_module(n, [os.path.join(self.repo_path,
                                                       *mod_path[:-1])])
 
-            if os.environ.get("VERBOSE"):
+            if VERBOSE:
                 print "loading module \"{}\" from {}".format(
                     mod_path_str, os.path.join(self.repo_path,
                                                *mod_path[:-1])

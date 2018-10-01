@@ -1,31 +1,56 @@
-#!c:\dev\bin\anaconda\python.exe
-import sys
-import subprocess
+#!/bin/sh
+
+# http://blog.ittybittyapps.com/blog/2013/09/03/git-pre-push/
+
+fail_content='pdb.set_trace()'
+
+echo $*
+
+while read lref lsha rref rsha; do
+    diff=`git diff $rsha $lsha`
+    found=`echo $diff | grep $fail_content`
+
+    if [ -n "$found" ]; then
+        # Display which commit first occurence of flag was found
+        commit=`echo $lsha | cut -c1-8`
+        echo "Found "$fail_content", first occurence was in $commit, not pushing"
+        echo "use --no-verify to skip check"
+        # TODO: exit after all are found
+        exit 1
+    fi
+done
+
+exit 0
+
+# # #!c:\dev\bin\anaconda\python.exe
+# import sys
+# import subprocess
 
 
-def piped_process(command):
-    return subprocess.Popen(
-        command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
+# def piped_process(command):
+    # return subprocess.Popen(
+        # command,
+        # stdout=subprocess.PIPE,
+        # stderr=subprocess.PIPE,
+    # )
 
 
-def check_pdb():
-    """Check commit diff for any debugging/pdb statements"""
+# def check_pdb():
+    # """Check commit diff for any debugging/pdb statements"""
 
-    diff_cmd = ['git', 'diff', '--cached']
+    # diff_cmd = ['git', 'diff', '--cached']
+    # import pdb; pdb.set_trace()  # noqa
 
-    diff = piped_process(diff_cmd)
-    (stdout, _) = diff.communicate()
+    # diff = piped_process(diff_cmd)
+    # (stdout, _) = diff.communicate()
 
-    for line in stdout.split('\n'):
-        if line.startswith('+') and "pdb.set_trace()" in line:
-            print "** Remove debug line **"
-            return 1
+    # for line in stdout.split('\n'):
+        # if line.startswith('+') and "pdb.set_trace()" in line:
+            # print "** Remove debug line **"
+            # return 1
 
-    return 0
+    # return 0
 
 
-if __name__ == '__main__':
-    sys.exit(check_pdb())
+# if __name__ == '__main__':
+    # sys.exit(check_pdb())

@@ -116,7 +116,8 @@ nmap _7 :set textwidth=70<CR>
 nmap _8 :set textwidth=80<CR>
 nmap _0 :set textwidth=0<CR>
 " /ef to split and scroll lock windows
-nmap <silent> <Leader>ef :vsplit<bar>wincmd l<bar>exe "norm!  Ljz<c-v><cr>"<cr>:set scb<cr>:wincmd h<cr>:set scb<cr>
+nmap <silent> <Leader>ef :vsplit<bar>wincmd l<bar>exe "norm!  Ljz<c-v><cr>"<cr>
+            \ :set scb<cr>:wincmd h<cr>:set scb<cr>
 
 " Move around in quickfix mode
 map ( :cp<CR>0
@@ -178,8 +179,11 @@ augroup python
     "autocmd FileType python setlocal nosmartindent autoindent
     "autocmd FileType python setlocal nosmartindent
     " add breakpoint using \(b|B)
-    autocmd FileType python noremap <silent> <leader>b oimport pdb; pdb.set_trace()  # noqa: E702, F402<esc>
-    autocmd FileType python noremap <silent> <leader>B Oimport pdb; pdb.set_trace()  # noqa: E702, F402<esc>
+    autocmd FileType python noremap <silent> <leader>b oimport pdb; pdb.set_trace()  # noqa<esc>
+    autocmd FileType python noremap <silent> <leader>B Oimport pdb; pdb.set_trace()  # noqa<esc>
+    " add try/except breakpoint using \eb
+    autocmd FileType python noremap <silent> <leader>eb Otry:<esc>j==oexcept:<cr>
+        \import pdb; pdb.set_trace()  # noqa<cr>print<esc>
 
     " set cython filetypes as python
     autocmd BufNewFile,BufRead *.pyx setlocal filetype=python
