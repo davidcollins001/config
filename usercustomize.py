@@ -7,8 +7,19 @@ import sys
 import imp
 from functools32 import lru_cache
 
+import importlib as il
+
 # seperator for user input
 SEP = ":"
+
+
+#    environment variables that changes the behaviour
+#    VERBOSE: print more info
+#    IMPORT_BLACKLIST: colon separated list of import names to ignore
+#        eg IMPORT_BLACKLIST gmt.grid:gmt.quant.util will mean these two
+#        libraries get imported from site-packages
+#    REPOS: colon separated list of windows paths to prepend on the search path,
+#        this causes that path to preferentially be searched for import
 
 # sanitise environment paths with normpath
 REPO_ROOT = os.path.normcase('c:/dev/code/gazprom.mt')
@@ -16,7 +27,7 @@ CONDA_ENV_ROOT = (os.environ.get('CONDA_ENV_ROOT') or
                   os.path.normcase('c:/dev/bin/Anaconda/envs'))
 VERBOSE = os.environ.get("VERBOSE")
 IMPORT_BLACKLIST = os.environ.get("IMPORT_BLACKLIST", "")
-REPOS = os.environ.get("REPOS", "")
+REPOS = os.environ.get("REPOS")
 
 IGNORE = ['build', 'dist']
 
@@ -25,14 +36,6 @@ IGNORE = ['build', 'dist']
 class GMTLoader(object):
     """
     Import hook to resolve local Python imports. Will search in `REPO_ROOT` for
-
-    environment variables that changes the behaviour
-    VERBOSE: print more info
-    IMPORT_BLACKLIST: colon separated list of import names to ignore
-        eg IMPORT_BLACKLIST gmt.grid:gmt.quant.util will mean these two
-        libraries get imported from site-packages
-    REPOS: colon separated list of windows paths to prepend on the search path,
-        this causes that path to preferentially be searched for import
 
     """
     def __init__(self):
@@ -85,8 +88,8 @@ class GMTLoader(object):
             return
 
         # prepend user specified repos
-        prepend = REPOS.split(SEP)
-        local_repos = prepend + self.local_repos()
+        local_repos = REPOS.split(SEP) if REPOS else []
+        local_repos.extend(self.local_repos())
 
         # capture calls to importlib because it breaks this import hook
         if name in ["importlib", "matplotlib.pyplot"]:
@@ -149,7 +152,7 @@ class GMTLoader(object):
                 elif m:
                     p = [os.path.dirname(m.__file__)]
                 else:
-                    p = sys.path
+                    p = package or sys.path
 
                 # only need module name, ie a, b or c from import a.b.c
                 module = imp.find_module(n, p)
@@ -158,10 +161,12 @@ class GMTLoader(object):
                     print "loading module \"{}\" from {}".format(
                         mod_path_str, os.path.join(*p)
                     )
+
                 # prepend package name if imported using import_module
                 path_str = mod_path_str
                 if package:
                     path_str = "{}.{}".format(package, mod_path_str)
+
                 # load module needs full path, ie a, a.b or a.b.c
                 m = imp.load_module(path_str, *module)
 
@@ -181,8 +186,8 @@ class GMTLoader(object):
         package = package or ''
 
         # prepend user specified repos
-        prepend = REPOS.split(SEP)
-        local_repos = prepend + self.local_repos()
+        local_repos = REPOS.split(SEP) if REPOS else []
+        local_repos.extend(self.local_repos())
 
         if name.startswith('.'):
             fullname = "{}{}".format(package or '', name)
@@ -196,7 +201,8 @@ class GMTLoader(object):
                 break
         else:
             self.repo_path = None
-            return self._load_module(name, package=package)
+            # return self._load_module(name, package=package)
+            return il.import_module(name, package=package)
 
         if VERBOSE:
             print "intercept importlib.import_module() for {} ({}) from {}" \

@@ -90,6 +90,8 @@ set autochdir
 "" switch to/from relativenumber
 map <leader>rn :set relativenumber!<cr>
 
+set pythondll=c:/dev/bin/Anaconda/python27.dll
+
 """""
 """"" EDITING MODES
 """""
@@ -197,6 +199,11 @@ augroup xml
     autocmd FileType xml setlocal shiftwidth=2
 augroup END
 
+augroup json
+    autocmd FileType xml setlocal foldmethod=indent
+    autocmd FileType json setlocal shiftwidth=2
+augroup END
+
 " java specific
 augroup java
     autocmd FileType java setlocal foldmethod=indent
@@ -300,6 +307,7 @@ let s:comment_map = {
     \   "ahk": ';',
     \   "vim": '"',
     \   "tex": '%',
+    \   "yaml": '#',
     \ }
 " \   "conf": '#',
 " \   "fstab": '#',
@@ -388,7 +396,7 @@ noremap <silent> ,/ :nohlsearch<CR>
 noremap <silent> ,p :set paste!<CR>
 
 
-function! HiInterestingWord(n) " {{{
+function! HiInterestingWord(n)
     " Save our location.
     normal! mz
 
@@ -409,10 +417,10 @@ function! HiInterestingWord(n) " {{{
 
     " Move back to our original location.
     normal! `z
-endfunction " }}}
+endfunction
 
 
-" Mappings {{{
+" Mappings
 
 nnoremap <silent> <leader>1 :call HiInterestingWord(1)<cr>
 nnoremap <silent> <leader>2 :call HiInterestingWord(2)<cr>
@@ -424,11 +432,13 @@ nnoremap <silent> <leader>6 :call HiInterestingWord(6)<cr>
 
 "" syntastic checker, use :Errors and :lclose to show and close errors
 let g:syntastic_python_checkers = ['flake8']
+let g:syntastic_python_flake8_args = "--max-complexity=10"
 let g:syntastic_always_populate_loc_list = 1
 let g:syntastic_loc_list_height = 5
 let g:syntastic_auto_loc_list = 2
-let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_open = 0
 let g:syntastic_check_on_wq = 0
+let g:syntastic_ignore_files = ['*pyx']
 
 
 "" tagbar config
@@ -454,6 +464,7 @@ Plugin 'TagBar'
 Plugin 'Align'
 Plugin 'Jinja'
 " Plugin 'Solarized'
+Plugin 'klen/rope-vim'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
