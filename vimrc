@@ -43,7 +43,7 @@ set whichwrap=<,>,[,]   " Left/right arrow keys wrap
 set nowrap
 set winheight=4         " At least 4 lines for current window
 set cinoptions=:0,p0,t0,(1s           " C language indent options
-set tags=.git/tags;$HOME" Tags file search path
+set tags=./.git/tags;   " Tags file search path
 set dictionary=/usr/dict/words        " Dictionary file path
 set path=.,include,../include,../../include,/usr/local/include/g++,/usr/local/lib/g++-include,/usr/include,, " Include file path
 set wildmode=longest,list	" Command line completion matches longest common
@@ -161,6 +161,7 @@ nmap > :bnext<CR>
 
 " Unfuck my screen
 nnoremap U :syntax sync fromstart<cr>:redraw!<cr>
+" use zx to unfuck folds
 
 " -/+ scroll like ^e/^y
 map - 
@@ -232,10 +233,8 @@ if has("gui_running")
 endif
 
 "" macros - http://byron.theclarkfamily.name/blog/archive/2007/03/1/
-"" insert function boiler plate
-let @f='0y$O/64a*o**  Routine: po**** Summary:64i*A/ja = Func()Returns( ){};k'
-let @s='0i"A",'
-" map <leader>ds """^J^J        Parameters^J        ----------^J^J        Returns^J        -------^J        """^J
+"" insert docstring boiler plate
+let @d='o"""Parameters----------Returns-------"""'
 
 "" make paragraph jump skip folds and not whitespace lines
 let g:ip_skipfold=1

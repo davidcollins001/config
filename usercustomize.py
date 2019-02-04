@@ -124,16 +124,17 @@ class GMTLoader(object):
         if "matplotlib.pyplot" in name:
             msg = "replacing {} with dummy function".format(name)
             print msg.center(len(name) + 6, "*")
-
-            def dummy(*a, **k):
-                pass
-            return dummy
+            return lambda *a, **k: None
 
         return self._load_module(name, package=package)
 
     def _load_module(self, name, package=None):
         """Actually do the import of name"""
         m, mod_path = None, []
+
+        if name in sys.modules:
+            return sys.modules[name]
+
         # split the full import name and import each part separately
         # so import a.b.c requires importing a then a.b and finally a.b.c
         for n in name.split('.'):
@@ -155,23 +156,24 @@ class GMTLoader(object):
                     p = package or sys.path
 
                 # only need module name, ie a, b or c from import a.b.c
+                # print '.....', p, name
                 module = imp.find_module(n, p)
-
-                if VERBOSE:
-                    print "loading module \"{}\" from {}".format(
-                        mod_path_str, os.path.join(*p)
-                    )
 
                 # prepend package name if imported using import_module
                 path_str = mod_path_str
                 if package:
                     path_str = "{}.{}".format(package, mod_path_str)
 
+                if VERBOSE:
+                    print "loading module \"{}\" from {}".format(
+                        path_str, os.path.join(*p)
+                    )
+
                 # load module needs full path, ie a, a.b or a.b.c
                 m = imp.load_module(path_str, *module)
 
         # this may not be needed
-        self.repo_path = None
+        # self.repo_path = None
         return m
 
     def import_module(self, name, package=None):
