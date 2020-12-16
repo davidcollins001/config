@@ -62,9 +62,12 @@ set nojoinspaces        " Use single space after full stop
 set breakindent
 let &showbreak=' '
 
+colorscheme default " Set default color scheme which is nicer
+
 " "set directory for backup files
 " if !isdirectory("./.vim_backup")
     " silent! execute "!mkdir ./.vim_backup"
+
 " endif
 " set backupdir="./.vim_backup"
 
@@ -170,12 +173,14 @@ map + 
 
 " buffer mappings
 map :bd<CR> :b#<CR>:bd#<CR>
+" map <C-B> <C-^>
 
 " folding
 set foldmethod=indent   " fold based on syntax
 set foldminlines=0      " fold a single line
 set foldopen-=block     " don't open fold for para jumps
 "set foldlevelstart=1    " start with all folds closed
+set foldopen-=block     " don't open folds with para jumps
 
 " python specific
 augroup python
@@ -193,6 +198,15 @@ augroup python
     " set cython filetypes as python
     autocmd BufNewFile,BufRead *.pyx setlocal filetype=python
     autocmd BufNewFile,BufRead *.pxd setlocal filetype=python
+augroup END
+
+" forth specific
+augroup forth
+    " autocmd BufNewFile,BufRead *.fs setlocal foldmethod=
+    autocmd FileType fs setlocal shiftwidth=2
+    autocmd FileType fs setlocal tabstop=2
+    autocmd FileType frt setlocal shiftwidth=2
+    autocmd FileType frt setlocal tabstop=2
 augroup END
 
 " xml specific
