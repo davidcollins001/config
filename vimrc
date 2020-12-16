@@ -34,6 +34,7 @@ set expandtab           " insert spaces in tabs
 set showmatch           " Show matching delimiters
 set showmode            " Show current input mode in status line
 set sidescroll=8        " Horizontal scrolling 8 columns at a time
+set scrolloff=0         " let L/H go right to the edge, no context
 set ignorecase          " Case insensitive search use \C to switch off of a search
 set smartcase           " Ignore ignorecase for uppercase letters in patterns
 set splitbelow          " Split windows below current window
@@ -173,6 +174,7 @@ map :bd<CR> :b#<CR>:bd#<CR>
 " folding
 set foldmethod=indent   " fold based on syntax
 set foldminlines=0      " fold a single line
+set foldopen-=block     " don't open fold for para jumps
 "set foldlevelstart=1    " start with all folds closed
 
 " python specific
@@ -235,10 +237,6 @@ endif
 "" macros - http://byron.theclarkfamily.name/blog/archive/2007/03/1/
 "" insert docstring boiler plate
 let @d='o"""Parameters----------Returns-------"""'
-
-"" make paragraph jump skip folds and not whitespace lines
-let g:ip_skipfold=1
-let g:ip_boundary='"\?\s*$'
 
 function! MyDiff()
    let opt = '-a --binary '
